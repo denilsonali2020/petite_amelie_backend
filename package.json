@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "nodemon --exec tsx src/index.ts",
     "dev:api": "DOTENV_CONFIG_QUIET=true nodemon --exec tsx src/index.ts --api",    
-    "seed": "prisma db seed"
+    "seed": "prisma db seed",
+    "build": "tsc",
+    "start": "node dist/src/index.js"
   },
   "keywords": [],
   "author": "",
