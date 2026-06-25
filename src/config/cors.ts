@@ -1,6 +1,6 @@
 import { CorsOptions } from "cors";
 
-//Permitir conexiones
+//Permitir conexiones desarrollo
 // export const corsConfig: CorsOptions = {
 //   origin: function (origin, callback) {
 //     const whitelist = [process.env.FRONTEND_URL];
@@ -16,7 +16,7 @@ import { CorsOptions } from "cors";
 //   credentials: true,
 // };
 
-
+//Cors Produccion
 export const corsConfig: CorsOptions = {
   origin: process.env.FRONTEND_URL,
   credentials: true,
