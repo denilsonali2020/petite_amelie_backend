@@ -18,16 +18,7 @@ import { CorsOptions } from "cors";
 
 
 export const corsConfig: CorsOptions = {
-  origin(origin, callback) {
-    // Peticiones sin Origin: Render health checks, Postman, etc.
-    if (!origin) {
-      return callback(null, true);
-    }
-
-    console.log("Origen bloqueado por CORS:", origin);
-    return callback(new Error(`Error de CORS: ${origin}`));
-  },
-
+  origin: process.env.FRONTEND_URL,
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
