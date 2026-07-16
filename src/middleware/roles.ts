@@ -11,7 +11,7 @@ export const ROLES = {
 export type Role = keyof typeof ROLES;
 
 /**
- * DEBE ejecutarse DESPUÉS del middleware 'authenticate'.
+ * debe ejecutarse despues del middleware 'authenticate'.
  */
 export const authorizeRoles = (...allowedRoles: Role[]) => {
   return (req: Request, res: Response, next: NextFunction) => {

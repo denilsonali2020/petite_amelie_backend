@@ -11,6 +11,12 @@ router.get("/navigation", HomeController.navigation);
 router.get("/latest-products", HomeController.latestProducts);
 
 // new sub-categories
-router.get("/sub-categories/latest", HomeController.getLatestSubcategories)
+router.get("/sub-categories/latest", HomeController.getLatestSubcategories);
+
+// best-sellers top 5 categories with more sales and 10 products bestsellesrs
+router.get(
+  "/best-sellers/latest",
+  HomeController.getBestSellersPerTopCategories,
+);
 
 export default router;

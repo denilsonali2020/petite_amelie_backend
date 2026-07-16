@@ -20,7 +20,7 @@ export const orderService = {
       });
       if (!user) throw new HttpError("El usuario no existe", 404);
       if (!user.quickPin)
-        throw new HttpError("El usuario no cuenta con pin de venta", 403);
+        throw new HttpError("El usuario no cuenta con pin de venta", 406);
       // 0.1 validar que el pin sea correcto del usuario
       const isQuickPinCorrect = await checkPassword(
         data.quickPin,
@@ -87,7 +87,6 @@ export const orderService = {
         });
       } //Fin de For
 
-      // --- NUEVO LÓGICA DE ENVÍO ---
       // Determinamos si requiere envío verificando si mandaron un nombre de receptor válido
       const requiresShipping =
         data.shippingDetails &&

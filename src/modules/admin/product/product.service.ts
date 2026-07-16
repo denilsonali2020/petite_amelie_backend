@@ -253,6 +253,7 @@ export const productService = {
         uuid: true,
         sku: true,
         name: true,
+        stock: true,
         price: true,
         discountPrice: true,
         isOnDiscount: true,

@@ -2,7 +2,6 @@ import type { Request, Response } from "express";
 import { homeService } from "./home.service.js";
 import { formatResponse } from "../../../shared/utils/serializers.js";
 
-
 export class HomeController {
   static navigation = async (req: Request, res: Response) => {
     try {
@@ -30,6 +29,23 @@ export class HomeController {
     try {
       const latestSubCategories = await homeService.getLatestSubcategories();
       return res.status(200).json(latestSubCategories);
+    } catch (error: any) {
+      return res.status(error.status || 500).json({
+        error: error.message,
+      });
+    }
+  };
+
+  static getBestSellersPerTopCategories = async (
+    req: Request,
+    res: Response,
+  ) => {
+    try {
+      const getBestSellersPerTopCategories =
+        await homeService.getBestSellersPerTopCategories();
+      return res
+        .status(200)
+        .json(formatResponse(getBestSellersPerTopCategories));
     } catch (error: any) {
       return res.status(error.status || 500).json({
         error: error.message,
