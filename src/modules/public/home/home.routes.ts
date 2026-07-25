@@ -19,4 +19,7 @@ router.get(
   HomeController.getBestSellersPerTopCategories,
 );
 
+// offers top 5 categories with more products in offer taking 10 products
+router.get("/offers/latest", HomeController.getOffersPerTopCategories);
+
 export default router;

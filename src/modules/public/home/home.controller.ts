@@ -52,4 +52,16 @@ export class HomeController {
       });
     }
   };
+
+  static getOffersPerTopCategories = async (req: Request, res: Response) => {
+    try {
+      const categoryProductsOffers =
+        await homeService.getOffersPerTopCategories();
+      return res.status(200).json(formatResponse(categoryProductsOffers));
+    } catch (error: any) {
+      return res.status(error.status || 500).json({
+        error: error.message,
+      });
+    }
+  };
 }

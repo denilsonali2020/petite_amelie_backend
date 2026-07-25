@@ -188,4 +188,61 @@ export const homeService = {
       throw error;
     }
   },
+
+  async getOffersPerTopCategories() {
+    try {
+      // we take the sub-categores where have at least one product on discount
+      const categoryProductsOffers = await prisma.category.findMany({
+        select: {
+          name: true,
+          products: {
+            select: {
+              uuid: true,
+              name: true,
+              description: true,
+              price: true,
+              isOnDiscount: true,
+              discountPrice: true,
+              images: {
+                select: {
+                  url: true,
+                },
+                where: { isPrimary: true },
+              },
+            },
+            where: {
+              isOnDiscount: true,
+              isActive: true,
+            },
+          },
+        },
+        where: {
+          products: { some: { isOnDiscount: true } },
+          parentId: { not: null },
+        },
+      });
+
+      const stats = categoryProductsOffers.map((category) => {
+        const mappedProducrts = category.products.map((product) => ({
+          ...product,
+          images: product.images[0].url,
+        }));
+
+        return {
+          ...category,
+          products: mappedProducrts,
+        };
+      });
+
+      return stats;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        throw new HttpError(
+          "La información enviada contiene campos no permitidos o el formato es incorrecto.",
+          400,
+        );
+      }
+      throw error;
+    }
+  },
 };
