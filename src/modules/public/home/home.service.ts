@@ -209,6 +209,7 @@ export const homeService = {
                 },
                 where: { isPrimary: true },
               },
+              stock: true, // tengo que eliminarlo cuando retorne la informacion
             },
             where: {
               isOnDiscount: true,
@@ -223,10 +224,14 @@ export const homeService = {
       });
 
       const stats = categoryProductsOffers.map((category) => {
-        const mappedProducrts = category.products.map((product) => ({
-          ...product,
-          images: product.images[0].url,
-        }));
+        // obtener la imagen, ordenarlo, sacar stock del objeto
+        const mappedProducrts = category.products
+          .map((product) => ({
+            ...product,
+            images: product.images[0].url,
+          }))
+          .sort((a, b) => b.stock - a.stock)
+          .map(({ stock, ...product }) => product);
 
         return {
           ...category,
