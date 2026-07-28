@@ -209,7 +209,7 @@ export const homeService = {
                 },
                 where: { isPrimary: true },
               },
-              stock: true, // tengo que eliminarlo cuando retorne la informacion
+              stock: true,
             },
             where: {
               isOnDiscount: true,
