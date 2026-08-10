@@ -13,6 +13,7 @@ export const storeProductService = {
           price: true,
           isOnDiscount: true,
           discountPrice: true,
+          stock: true,
           images: {
             select: {
               url: true,
