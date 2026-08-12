@@ -83,12 +83,9 @@ export class userController {
     }
   };
 
-  static updateName = async (
-    req: Request<{ uuid: User["uuid"] }>,
-    res: Response,
-  ) => {
+  static updateName = async (req: Request, res: Response) => {
     try {
-      const { uuid } = req.params;
+      const { uuid } = req.user!;
       const name = await userService.updateName(uuid, req.body);
       return res.status(200).json(name);
     } catch (error: any) {
@@ -110,12 +107,9 @@ export class userController {
     }
   };
 
-  static changeQuickPin = async (
-    req: Request<{ uuid: User["uuid"] }>,
-    res: Response,
-  ) => {
+  static changeQuickPin = async (req: Request, res: Response) => {
     try {
-      const { uuid } = req.params;
+      const { uuid } = req.user!;
       await userService.changeQuickPin(uuid, req.body);
       return res.status(200).send("Pin actualizado!");
     } catch (error: any) {

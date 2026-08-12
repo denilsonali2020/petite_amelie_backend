@@ -69,18 +69,18 @@ export const authenticate = async (
 };
 
 // Middleware para validar que el usuario autenticado es el mismo que el que se intenta modificar
-export const checkIdentityMatch = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  const { uuid } = req.params;
+// export const checkIdentityMatch = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction,
+// ) => {
+//   const { uuid } = req.params;
 
-  if (req.user?.uuid !== uuid) {
-    return res.status(409).json({ error: "Acceso no permitido" });
-  }
+//   if (req.user?.uuid !== uuid) {
+//     return res.status(409).json({ error: "Acceso no permitido" });
+//   }
 
-  next();
-};
+//   next();
+// };
 
 

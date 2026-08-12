@@ -3,10 +3,7 @@ import { body, param } from "express-validator";
 import { handleInputErrors } from "../../../middleware/validation.js";
 import { userController } from "./user.controller.js";
 import { USER_ROLES } from "./user.types.js";
-import {
-  authenticate,
-  checkIdentityMatch,
-} from "../../../middleware/admin-auth.js";
+import { authenticate } from "../../../middleware/admin-auth.js";
 import { authorizeRoles, ROLES } from "../../../middleware/roles.js";
 
 const router = Router();
@@ -99,16 +96,14 @@ router.patch(
 
 //Editar nombre de usuario en sesion
 router.patch(
-  "/:uuid/name",
+  "/name",
   authenticate,
-  checkIdentityMatch,
-  param("uuid").isUUID().withMessage("Usuario no valido"),
   body("name").notEmpty().withMessage("El nombre del usuario es requerido"),
   handleInputErrors,
   userController.updateName,
 );
 
-//cambiar contraseña de usuario en sesion
+//cambiar contraseña de usuario en sesion propia
 router.patch(
   "/change-password",
   authenticate,
@@ -122,10 +117,8 @@ router.patch(
 
 //cambiar quickPin del usuario
 router.patch(
-  "/:uuid/change-quickpin",
+  "/change-quickpin",
   authenticate,
-  checkIdentityMatch,
-  param("uuid").isUUID().withMessage("Usuario no valido"),
   body("quickPin")
     .notEmpty()
     .withMessage("El pin no puede ir vacio")
