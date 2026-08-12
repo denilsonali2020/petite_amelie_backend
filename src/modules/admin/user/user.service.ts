@@ -95,11 +95,12 @@ export const userService = {
         select: { password: true },
       });
 
+      if (!user) throw new HttpError("Usuario no existe", 404);
+
       const isPasswordCorrect = await checkPassword(
         data.password,
-        user!.password,
+        user.password,
       );
-
       if (!isPasswordCorrect) throw new HttpError("Contraseña incorrecta", 401);
     } catch (error: any) {
       if (error instanceof Prisma.PrismaClientValidationError) {
@@ -226,8 +227,8 @@ export const userService = {
         },
         select: { uuid: true, name: true },
         orderBy: {
-          role: "asc"
-        }
+          role: "asc",
+        },
       });
       return users;
     } catch (error: any) {

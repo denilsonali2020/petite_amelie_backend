@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { Category, User } from "../../../generated/prisma/client.js";
+import { User } from "../../../generated/prisma/client.js";
 import { userService } from "./user.service.js";
 
 export class userController {
@@ -55,12 +55,10 @@ export class userController {
     }
   };
 
-  static verifyPassword = async (
-    req: Request<{ uuid: User["uuid"] }>,
-    res: Response,
-  ) => {
+  static verifyPassword = async (req: Request, res: Response) => {
     try {
-      const { uuid } = req.params;
+      const { uuid } = req.user!;
+
       await userService.verifyPassword(uuid, req.body);
       return res.status(200).send("Password correcto!");
     } catch (error: any) {
@@ -130,12 +128,8 @@ export class userController {
     }
   };
 
-  static getUsersQuickPin = async (
-    req: Request,
-    res: Response,
-  ) => {
+  static getUsersQuickPin = async (req: Request, res: Response) => {
     try {
-
       const users = await userService.getUsersQuickPin();
       return res.status(200).json(users);
     } catch (error: any) {

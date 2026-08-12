@@ -55,7 +55,7 @@ export const authenticate = async (
         req.user = user as IUser;
         next();
       } else {
-        return res.status(401).json({ error: "Usuario no encontrado" });
+        return res.status(404).json({ error: "Usuario no encontrado" });
       }
     }
   } catch (error: any) {

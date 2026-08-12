@@ -29,7 +29,7 @@ router.post(
   userController.createUser,
 );
 
-//usuarios para modulo de ventas al momento de decidir quien vende
+//verificar para modulo de ventas al momento de decidir quien vende
 router.get(
   "/quick-pin",
   authenticate,
@@ -76,16 +76,15 @@ router.put(
 
 //validar contraseña
 router.post(
-  "/:uuid/check-password",
+  "/check-password",
   authenticate,
   authorizeRoles(ROLES.OWNER, ROLES.ADMIN, ROLES.CASHIER),
-  param("uuid").isUUID().withMessage("Usuario no valido"),
   body("password").notEmpty().withMessage("La contraseña es requerida"),
   handleInputErrors,
   userController.verifyPassword,
 );
 
-// Owner Recuperar la contraseña de un usuario si la olvido
+// Para que el Owner resetee la contraseña de un usuario si la olvido
 router.patch(
   "/:uuid/recovery",
   authenticate,
