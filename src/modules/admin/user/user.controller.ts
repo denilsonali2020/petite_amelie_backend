@@ -98,12 +98,9 @@ export class userController {
     }
   };
 
-  static changePassword = async (
-    req: Request<{ uuid: User["uuid"] }>,
-    res: Response,
-  ) => {
+  static changePassword = async (req: Request, res: Response) => {
     try {
-      const { uuid } = req.params;
+      const { uuid } = req.user!;
       await userService.changePassword(uuid, req.body);
       return res.status(200).send("Contraseña actualizada!");
     } catch (error: any) {

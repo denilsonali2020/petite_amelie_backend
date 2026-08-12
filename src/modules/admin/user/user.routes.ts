@@ -110,10 +110,8 @@ router.patch(
 
 //cambiar contraseña de usuario en sesion
 router.patch(
-  "/:uuid/change-password",
+  "/change-password",
   authenticate,
-  checkIdentityMatch,
-  param("uuid").isUUID().withMessage("Usuario no valido"),
   body("password").notEmpty().withMessage("La contraseña es requerida"),
   body("newPassword")
     .isLength({ min: 10 })
