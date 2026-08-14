@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { body, param } from "express-validator";
+import { body, param, query } from "express-validator";
 import { handleInputErrors } from "../../../middleware/validation.js";
 import { upload } from "../../../middleware/upload.js";
 import { ProductController } from "./product.controller.js";
@@ -8,7 +8,83 @@ import { authorizeRoles, ROLES } from "../../../middleware/roles.js";
 
 const router = Router();
 
-// Product routes
+// Product Routes
+// =========================
+// RUTAS ESTÁTICAS
+// =========================
+// Buscador de productos mediante nombre o sku
+router.get(
+  "/search",
+  authenticate,
+  authorizeRoles(ROLES.OWNER, ROLES.ADMIN, ROLES.CASHIER),
+  query("p")
+    .isString()
+    .trim()
+    .isLength({ min: 2 })
+    .withMessage("Ingrese una cadena de texto con al menos 2 caracteres"),
+  handleInputErrors,
+  ProductController.searchProduct,
+);
+
+// =========================
+// RUTAS DINAMICAS LARGAS
+// =========================
+
+//cambiarImagen de un producto
+router.put(
+  "/:productId/product/:imageId/image",
+  authenticate,
+  authorizeRoles(ROLES.OWNER, ROLES.ADMIN),
+  upload.single("image"),
+  param("productId").isUUID().withMessage("Producto no válidó"),
+  param("imageId").isUUID().withMessage("Imagen no válidá"),
+  handleInputErrors,
+  ProductController.updateProductImage,
+);
+
+//obtener productos de una categoria por uuid
+router.get(
+  "/:categoryId/products",
+  authenticate,
+  authorizeRoles(ROLES.OWNER, ROLES.ADMIN, ROLES.CASHIER),
+  param("categoryId").isUUID().withMessage("Categoria no válidá"),
+  handleInputErrors,
+  ProductController.getProductsByCategory,
+);
+
+//subir una imagen de un producto
+router.post(
+  "/:productId/image",
+  authenticate,
+  authorizeRoles(ROLES.OWNER, ROLES.ADMIN),
+  upload.single("image"),
+  param("productId").isUUID().withMessage("Producto no válidó"),
+  handleInputErrors,
+  ProductController.createProductImage,
+);
+
+//eliminar una imagen
+router.delete(
+  "/:imageId/image",
+  authenticate,
+  authorizeRoles(ROLES.OWNER, ROLES.ADMIN),
+  param("imageId").isUUID().withMessage("Imagen no válida"),
+  handleInputErrors,
+  ProductController.deleteProductImage,
+);
+
+//buscar un producto por sku para nueva orden
+router.post(
+  "/:sku/order",
+  authenticate,
+  authorizeRoles(ROLES.OWNER, ROLES.ADMIN, ROLES.CASHIER),
+  param("sku").isString().withMessage("Sku no válido"),
+  ProductController.getProductOrder,
+);
+
+// =========================
+// RUTAS DINÁMICAS CORTAS
+// =========================
 //crear un producto
 router.post(
   "/:categoryId",
@@ -59,16 +135,6 @@ router.get(
   param("uuid").isUUID().withMessage("Producto no válidó"),
   handleInputErrors,
   ProductController.getProduct,
-);
-
-//obtener productos de una categoria por uuid
-router.get(
-  "/:categoryId/products",
-  authenticate,
-  authorizeRoles(ROLES.OWNER, ROLES.ADMIN, ROLES.CASHIER),
-  param("categoryId").isUUID().withMessage("Categoria no válidá"),
-  handleInputErrors,
-  ProductController.getProductsByCategory,
 );
 
 //actualizar un producto
@@ -123,48 +189,6 @@ router.patch(
   param("uuid").isUUID().withMessage("Producto no válidó"),
   handleInputErrors,
   ProductController.isActiveProduct,
-);
-
-//cambiarImagen de un producto
-router.put(
-  "/:productId/product/:imageId/image",
-  authenticate,
-  authorizeRoles(ROLES.OWNER, ROLES.ADMIN),
-  upload.single("image"),
-  param("productId").isUUID().withMessage("Producto no válidó"),
-  param("imageId").isUUID().withMessage("Imagen no válidá"),
-  handleInputErrors,
-  ProductController.updateProductImage,
-);
-
-//subir una imagen de un producto
-router.post(
-  "/:productId/image",
-  authenticate,
-  authorizeRoles(ROLES.OWNER, ROLES.ADMIN),
-  upload.single("image"),
-  param("productId").isUUID().withMessage("Producto no válidó"),
-  handleInputErrors,
-  ProductController.createProductImage,
-);
-
-//eliminar una imagen
-router.delete(
-  "/:imageId/image",
-  authenticate,
-  authorizeRoles(ROLES.OWNER, ROLES.ADMIN),
-  param("imageId").isUUID().withMessage("Imagen no válida"),
-  handleInputErrors,
-  ProductController.deleteProductImage,
-);
-
-//buscar un producto por sku para nueva orden
-router.post(
-  "/:sku/order",
-  authenticate,
-  authorizeRoles(ROLES.OWNER, ROLES.ADMIN, ROLES.CASHIER),
-  param("sku").isString().withMessage("Sku no válido"),
-  ProductController.getProductOrder,
 );
 
 export default router;

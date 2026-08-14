@@ -3,7 +3,7 @@ import { Prisma, Product } from "../../../generated/prisma/client.js";
 import { HttpError } from "../../../shared/errors/HttpError.js";
 
 export const storeProductService = {
-  async searchProduct(uuid: Product["uuid"]) {
+  async findProduct(uuid: Product["uuid"]) {
     try {
       const product = await prisma.product.findUnique({
         where: { uuid },

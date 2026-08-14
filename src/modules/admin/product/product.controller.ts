@@ -158,4 +158,20 @@ export class ProductController {
       });
     }
   };
+
+  static searchProduct = async (
+    req: Request<{}, {}, {}, { p: string }>,
+    res: Response,
+  ) => {
+    try {
+      const { p } = req.query;
+
+      const product = await productService.searchProduct(p);
+      return res.status(200).json(product);
+    } catch (error: any) {
+      return res.status(error.status || 500).json({
+        error: error.message,
+      });
+    }
+  };
 }

@@ -5,13 +5,12 @@ import { handleInputErrors } from "../../../middleware/validation.js";
 
 const router = Router();
 
-// Product routes
-//list of categories for navigation
+// StoreProduct routes
 router.get(
   "/:uuid",
   param("uuid").isUUID().withMessage("Producto no valido"),
   handleInputErrors,
-  StoreProductController.searchProduct,
+  StoreProductController.findProduct,
 );
 
 export default router;

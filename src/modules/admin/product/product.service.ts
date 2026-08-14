@@ -263,4 +263,40 @@ export const productService = {
 
     return product;
   },
+
+  async searchProduct(p: string) {
+    const products = await prisma.product.findMany({
+      where: {
+        OR: [
+          {
+            name: {
+              contains: p, // en sql seria el LIKE
+              mode: "insensitive", // ignora mayusculas de minusculas
+            },
+          },
+          {
+            sku: p,
+          },
+        ],
+      },
+      select: {
+        name: true,
+        sku: true,
+        isActive: true,
+        images: {
+          select: {
+            url: true,
+          },
+          where: {
+            isPrimary: true,
+          },
+        },
+      },
+    });
+
+    return products.map((product) => ({
+      ...product,
+      images: product.images[0].url,
+    }));
+  },
 };
