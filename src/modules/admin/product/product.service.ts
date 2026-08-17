@@ -280,6 +280,7 @@ export const productService = {
         ],
       },
       select: {
+        uuid: true,
         name: true,
         sku: true,
         isActive: true,
@@ -292,6 +293,7 @@ export const productService = {
           },
         },
       },
+      take: 10,
     });
 
     return products.map((product) => ({
