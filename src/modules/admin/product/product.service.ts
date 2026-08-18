@@ -109,7 +109,6 @@ export const productService = {
             where: { isPrimary: true },
             select: {
               url: true,
-              isPrimary: true,
             },
             take: 1,
           },
@@ -129,7 +128,7 @@ export const productService = {
     // Formateamos los productos para dejar la imagen principal como objeto (tu lógica original)
     const formattedProducts = products.map((product) => ({
       ...product,
-      images: product.images.find((img) => img.isPrimary === true) || null,
+      images: product.images[0],
     }));
 
     // Retornamos el objeto con la estructura de paginación
