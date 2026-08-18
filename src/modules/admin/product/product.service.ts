@@ -111,6 +111,7 @@ export const productService = {
               url: true,
               isPrimary: true,
             },
+            take: 1,
           },
         },
         orderBy: { createdAt: "desc" },
@@ -291,6 +292,7 @@ export const productService = {
           where: {
             isPrimary: true,
           },
+          take: 1,
         },
       },
       take: 10,

@@ -49,6 +49,7 @@ export const homeService = {
             where: {
               isPrimary: true,
             },
+            take: 1,
           },
         },
         orderBy: { id: "desc" },
@@ -122,6 +123,7 @@ export const homeService = {
                 where: {
                   isPrimary: true,
                 },
+                take: 1,
               },
               orderItems: {
                 select: {

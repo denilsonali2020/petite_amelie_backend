@@ -14,6 +14,7 @@ import reportRoutes from "./modules/admin/report/reports.routes.js";
 
 import homeRoutes from "./modules/public/home/home.routes.js";
 import storeProductRoutes from "./modules/public/storeProduct/storeProduct.routes.js";
+import storeCategoryRoutes from "./modules/public/storeCategory/storeCategory.routes.js";
 
 // import authRoutes from "../src/modules/auth/auth.routes.js"; //rutas de cliente pendiente
 import { corsConfig } from "./config/cors.js";
@@ -44,6 +45,7 @@ app.use("/api/reports", reportRoutes);
 //Routes Public Store
 app.use("/api/home", homeRoutes);
 app.use("/api/store/products", storeProductRoutes);
+app.use("/api/store/category", storeCategoryRoutes);
 
 // app.use("/api/auth", authRoutes); //rutas de cliente pendiente
 
