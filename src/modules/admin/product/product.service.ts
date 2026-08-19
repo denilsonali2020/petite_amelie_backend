@@ -140,6 +140,8 @@ export const productService = {
         totalPages,
         currentPage: page,
         limit,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
       },
     };
   },
