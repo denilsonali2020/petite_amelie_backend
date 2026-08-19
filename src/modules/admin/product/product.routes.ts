@@ -48,6 +48,14 @@ router.get(
   authenticate,
   authorizeRoles(ROLES.OWNER, ROLES.ADMIN, ROLES.CASHIER),
   param("categoryId").isUUID().withMessage("Categoria no válidá"),
+  query("page")
+    .isInt({ min: 1 })
+    .toInt()
+    .withMessage("La página debe ser un número entero mayor a 0"),
+  query("limit")
+    .isInt({ min: 10, max: 100 })
+    .toInt()
+    .withMessage("El límite debe ser un número entre 1 y 100"),
   handleInputErrors,
   ProductController.getProductsByCategory,
 );

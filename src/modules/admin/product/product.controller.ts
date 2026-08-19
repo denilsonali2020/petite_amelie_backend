@@ -48,11 +48,8 @@ export class ProductController {
     res: Response,
   ) => {
     try {
-      let page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 10;
-      if (page < 1) {
-        page = 1;
-      }
+      let page = Number(req.query.page);
+      const limit = Number(req.query.limit);
       const { categoryId } = req.params;
       const products = await productService.getProductsByCategory(
         categoryId,
