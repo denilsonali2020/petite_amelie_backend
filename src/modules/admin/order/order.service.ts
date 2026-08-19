@@ -291,10 +291,9 @@ export const orderService = {
   },
 
   async getOrders(page: number, limit: number) {
-    // Calculamos cuántos registros saltar
+    // Calculamos cuantos registros saltar
     const skip = (page - 1) * limit;
 
-    // Ejecutamos la búsqueda de órdenes y el conteo total en paralelo
     const [orders, totalOrders] = await prisma.$transaction([
       prisma.order.findMany({
         skip: skip,
@@ -331,6 +330,8 @@ export const orderService = {
         totalPages,
         currentPage: page,
         limit,
+        hasNextPage: page < totalPages,
+        hasPreviousPage: page > 1,
       },
     };
   },
@@ -346,8 +347,8 @@ export const orderService = {
         customerName: true,
         total: true,
         status: true,
-        deliveryType: true, // NUEVO: Extraemos el tipo de entrega
-        shippingCost: true, // NUEVO: Extraemos el costo del envío
+        deliveryType: true, 
+        shippingCost: true, 
         pointsEarned: true,
         createdAt: true,
         user: {
@@ -358,7 +359,6 @@ export const orderService = {
             method: true,
           },
         },
-        // NUEVO: Extraemos los detalles de envío
         shippingDetails: {
           select: {
             recipientName: true,

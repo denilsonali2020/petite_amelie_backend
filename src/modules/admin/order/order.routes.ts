@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { body, param } from "express-validator";
+import { body, param, query } from "express-validator";
 import { handleInputErrors } from "../../../middleware/validation.js";
 import { OrderController } from "./order.controller.js";
 import { authenticate } from "../../../middleware/admin-auth.js";
@@ -84,6 +84,14 @@ router.post(
 router.get(
   "/",
   authenticate,
+  query("page")
+    .isInt({ min: 1 })
+    .toInt()
+    .withMessage("La página debe ser un número entero mayor a 0"),
+  query("limit")
+    .isInt({ min: 10, max: 100 })
+    .toInt()
+    .withMessage("El límite debe ser un número entre 1 y 100"),
   authorizeRoles(ROLES.OWNER, ROLES.ADMIN, ROLES.CASHIER),
   OrderController.getOrders,
 );

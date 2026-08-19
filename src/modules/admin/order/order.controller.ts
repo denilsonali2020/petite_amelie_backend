@@ -16,11 +16,9 @@ export class OrderController {
 
   static getOrders = async (req: Request, res: Response) => {
     try {
-      let page = parseInt(req.query.page as string) || 1;
-      const limit = parseInt(req.query.limit as string) || 10;
-      if (page < 1) {
-        page = 1;
-      }
+      let page = Number(req.query.page);
+      const limit = Number(req.query.limit);
+
       const paginatedOrders = await orderService.getOrders(page, limit);
       return res.status(200).json(paginatedOrders);
     } catch (error: any) {
