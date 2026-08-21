@@ -48,7 +48,7 @@ export class ProductController {
     res: Response,
   ) => {
     try {
-      let page = Number(req.query.page);
+      const page = Number(req.query.page);
       const limit = Number(req.query.limit);
       const { categoryId } = req.params;
       const products = await productService.getProductsByCategory(

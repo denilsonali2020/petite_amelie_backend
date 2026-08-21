@@ -5,12 +5,15 @@ import { formatResponse } from "../../../shared/utils/serializers.js";
 
 export class StoreCategoryController {
   static productsByCategory = async (
-    req: Request<{ uuid: Category["uuid"] }>,
+    req: Request<{ categoryId: Category["uuid"] }>,
     res: Response,
   ) => {
     try {
-      const { uuid } = req.params;
-      const categoryProducts = await storeCategoryService.productsByCategory(uuid);
+      const page = Number(req.query.page);
+      const limit = Number(req.query.limit);
+
+      const { categoryId } = req.params;
+      const categoryProducts = await storeCategoryService.productsByCategory(categoryId, page, limit);
       return res.status(200).json(formatResponse(categoryProducts));
     } catch (error: any) {
       return res.status(error.status || 500).json({

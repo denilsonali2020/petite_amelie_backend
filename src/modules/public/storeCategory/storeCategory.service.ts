@@ -3,50 +3,68 @@ import { Prisma, Category } from "../../../generated/prisma/client.js";
 import { HttpError } from "../../../shared/errors/HttpError.js";
 
 export const storeCategoryService = {
-  async productsByCategory(uuid: Category["uuid"]) {
+  async productsByCategory(
+    categoryId: Category["uuid"],
+    page: number,
+    limit: number,
+  ) {
     try {
-      const categoryProducts = await prisma.category.findUnique({
-        where: { uuid },
-        select: {
-          name: true,
-          description: true,
-          imageURL: true,
-          products: {
-            select: {
-              uuid: true,
-              name: true,
-              description: true,
-              price: true,
-              isOnDiscount: true,
-              discountPrice: true,
-              stock: true,
-              images: {
-                select: {
-                  url: true,
-                },
-                where: {
-                  isPrimary: true,
-                },
-                take: 1,
+      const skip = (page - 1) * limit;
+
+      const [category, products, totalProducts] = await prisma.$transaction([
+        prisma.category.findUnique({
+          where: { uuid: categoryId },
+          select: { name: true },
+        }),
+        prisma.product.findMany({
+          where: {
+            AND: [{ category: { uuid: categoryId } }, { isActive: true }],
+          },
+          skip,
+          take: limit,
+          select: {
+            uuid: true,
+            name: true,
+            description: true,
+            price: true,
+            isOnDiscount: true,
+            discountPrice: true,
+            stock: true,
+            images: {
+              select: {
+                url: true,
               },
-            },
-            where: {
-              isActive: true,
+              where: {
+                isPrimary: true,
+              },
+              take: 1,
             },
           },
-        },
-      });
+        }),
+        prisma.product.count({
+          where: { category: { uuid: categoryId } },
+        }),
+      ]);
 
-      if (!categoryProducts) throw new HttpError("La categoria no existe", 404);
+      if (!category) throw new HttpError("La categoria no existe", 404);
 
-      const productsMapped = categoryProducts.products.map((product) => ({
+      const totalPages = Math.ceil(totalProducts / limit);
+
+      const formattedProducts = products.map((product) => ({
         ...product,
         images: product.images[0].url,
       }));
-
       return {
-        ...categoryProducts,
-        products: productsMapped,
+        ...category,
+        products: formattedProducts,
+        meta: {
+          totalProducts,
+          totalPages,
+          currentPage: page,
+          limit,
+          hasNextPage: page < totalPages,
+          hasPreviousPage: page > 1,
+        },
       };
     } catch (error: any) {
       if (error instanceof Prisma.PrismaClientValidationError) {

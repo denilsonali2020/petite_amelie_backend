@@ -78,72 +78,82 @@ export const productService = {
     page: number,
     limit: number,
   ) {
-    const skip = (page - 1) * limit;
+    try {
+      const skip = (page - 1) * limit;
 
-    // Ejecutamos 3 promesas al mismo tiempo para máxima velocidad:
-    // 1. Obtener el nombre de la categoría
-    // 2. Obtener los productos paginados de esa categoría
-    // 3. Contar el total de productos de esa categoría
-    const [category, products, totalProducts] = await prisma.$transaction([
-      prisma.category.findUnique({
-        where: { uuid: categoryId },
-        select: { name: true },
-      }),
-      prisma.product.findMany({
-        where: { category: { uuid: categoryId } },
-        skip: skip,
-        take: limit,
-        select: {
-          uuid: true,
-          name: true,
-          sku: true,
-          cost: true,
-          price: true,
-          isOnDiscount: true,
-          discountPrice: true,
-          isReward: true,
-          pointsValue: true,
-          stock: true,
-          isActive: true,
-          images: {
-            where: { isPrimary: true },
-            select: {
-              url: true,
+      // Ejecutamos 3 promesas al mismo tiempo para máxima velocidad:
+      // 1. Obtener el nombre de la categoría
+      // 2. Obtener los productos paginados de esa categoría
+      // 3. Contar el total de productos de esa categoría
+      const [category, products, totalProducts] = await prisma.$transaction([
+        prisma.category.findUnique({
+          where: { uuid: categoryId },
+          select: { name: true },
+        }),
+        prisma.product.findMany({
+          where: { category: { uuid: categoryId } },
+          skip,
+          take: limit,
+          select: {
+            uuid: true,
+            name: true,
+            sku: true,
+            cost: true,
+            price: true,
+            isOnDiscount: true,
+            discountPrice: true,
+            isReward: true,
+            pointsValue: true,
+            stock: true,
+            isActive: true,
+            images: {
+              where: { isPrimary: true },
+              select: {
+                url: true,
+              },
+              take: 1,
             },
-            take: 1,
           },
+          orderBy: { createdAt: "desc" },
+        }),
+        prisma.product.count({
+          where: { category: { uuid: categoryId } },
+        }),
+      ]);
+
+      if (!category) throw new HttpError("La categoria no existe", 404);
+
+      // Calculamos el total de páginas
+      const totalPages = Math.ceil(totalProducts / limit);
+
+      // Formateamos los productos para dejar la imagen principal como objeto (tu lógica original)
+      const formattedProducts = products.map((product) => ({
+        ...product,
+        images: product.images[0],
+      }));
+
+      // Retornamos el objeto con la estructura de paginación
+      return {
+        name: category.name, // El nombre de la categoría para tu UI
+        data: formattedProducts, // Los productos paginados
+        meta: {
+          totalProducts,
+          totalPages,
+          currentPage: page,
+          limit,
+          hasNextPage: page < totalPages,
+          hasPreviousPage: page > 1,
         },
-        orderBy: { createdAt: "desc" },
-      }),
-      prisma.product.count({
-        where: { category: { uuid: categoryId } },
-      }),
-    ]);
-
-    if (!category) throw new HttpError("La categoria no existe", 404);
-
-    // Calculamos el total de páginas
-    const totalPages = Math.ceil(totalProducts / limit);
-
-    // Formateamos los productos para dejar la imagen principal como objeto (tu lógica original)
-    const formattedProducts = products.map((product) => ({
-      ...product,
-      images: product.images[0],
-    }));
-
-    // Retornamos el objeto con la estructura de paginación
-    return {
-      name: category.name, // El nombre de la categoría para tu UI
-      data: formattedProducts, // Los productos paginados
-      meta: {
-        totalProducts,
-        totalPages,
-        currentPage: page,
-        limit,
-        hasNextPage: page < totalPages,
-        hasPreviousPage: page > 1,
-      },
-    };
+      };
+    } catch (error: any) {
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        throw new HttpError(
+          "La información enviada contiene campos no permitidos o el formato es incorrecto.",
+          400,
+        );
+      }
+      throw error;
+    }
   },
 
   async updateProduct(uuid: product["uuid"], data: updateProductType) {
