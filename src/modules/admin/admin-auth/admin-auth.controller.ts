@@ -42,7 +42,7 @@ export class AdminAuthController {
   static logout = async (req: Request, res: Response) => {
     try {
       const cookies = req.cookies;
-      if (!cookies?.jwt) return res.sendStatus(204); // No content
+      if (!cookies?.jwt) return res.sendStatus(204);
 
       await adminAuthService.logout(cookies.jwt);
 

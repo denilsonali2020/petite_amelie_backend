@@ -1,11 +1,15 @@
 import jwt from "jsonwebtoken";
 
-// Access Token: Vive poco tiempo (ej. 15 minutos). Va en memoria del frontend.
+// Access Token: duración temporal de desarrollo.
+// En producción debe configurarse con una duración corta.
 export const generateAccessToken = (payload: { uuid: string }) => {
   return jwt.sign(payload, process.env.JWT_ACCESS_SECRET!, { expiresIn: "7d" });
 };
 
-// Refresh Token: Vive mucho tiempo (ej. 7 días). Va en la Cookie HttpOnly.
+// Refresh Token: duración larga.
+// Se almacena en una Cookie HttpOnly.
 export const generateRefreshToken = (payload: { uuid: string }) => {
-  return jwt.sign(payload, process.env.JWT_REFRESH_SECRET!, { expiresIn: "7d" });
+  return jwt.sign(payload, process.env.JWT_REFRESH_SECRET!, {
+    expiresIn: "7d",
+  });
 };
