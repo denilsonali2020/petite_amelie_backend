@@ -5,10 +5,11 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --exec tsx src/index.ts",
-    "dev:api": "DOTENV_CONFIG_QUIET=true nodemon --exec tsx src/index.ts --api",    
+    "dev:api": "DOTENV_CONFIG_QUIET=true nodemon --exec tsx src/index.ts --api",
     "seed": "prisma db seed",
     "build": "prisma generate && tsc && cp -R src/generated dist/generated",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -37,13 +38,18 @@
     "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^25.1.0",
     "@types/nodemailer": "^7.0.9",
     "@types/pg": "^8.16.0",
+    "@types/supertest": "^7.2.1",
+    "jest": "^30.4.2",
     "nodemon": "^3.1.11",
     "prisma": "^7.3.0",
+    "supertest": "^7.2.2",
+    "ts-jest": "^29.4.12",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
