@@ -5,14 +5,20 @@
     "lib": ["esnext"],
     "target": "ESNext",
     "moduleResolution": "NodeNext", // Imprescindible para ESM
-    "module": "NodeNext",           // Imprescindible para ESM
+    "module": "NodeNext", // Imprescindible para ESM
     "strict": true,
     "types": ["node", "jest"],
     "sourceMap": true,
     "esModuleInterop": true,
     "declaration": true,
-    "skipLibCheck": true,            // Añade esto para evitar errores de tipos en librerías
+    "skipLibCheck": true, // Añade esto para evitar errores de tipos en librerías
     "isolatedModules": true
   },
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts",
+    "src/**/__tests__/**",
+    "src/**/__test__/**"
+  ]
 }
