@@ -72,6 +72,9 @@ export const categoryService = {
         },
       },
     });
+
+    if (!subCategories) throw new HttpError("La categoria no existe", 404);
+
     return subCategories;
   },
 
@@ -82,7 +85,7 @@ export const categoryService = {
         name: true,
         position: true,
         imageURL: true,
-        description:true,
+        description: true,
       },
     });
     if (!category) throw new HttpError("La categoria no existe", 404);
