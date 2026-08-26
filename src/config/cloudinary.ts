@@ -1,7 +1,9 @@
 import { v2 as cloudinary } from "cloudinary";
 import dotenv from "dotenv";
 
-dotenv.config();
+dotenv.config({
+  quiet: true, //comentario solo para minimizar informacion en consola una vez se ejecuta el backend
+});
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
