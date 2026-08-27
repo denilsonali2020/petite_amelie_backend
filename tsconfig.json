@@ -15,10 +15,4 @@
     "isolatedModules": true
   },
   "include": ["src/**/*.ts"],
-  "exclude": [
-    "src/**/*.test.ts",
-    "src/**/*.spec.ts",
-    "src/**/__tests__/**",
-    "src/**/__test__/**"
-  ]
 }

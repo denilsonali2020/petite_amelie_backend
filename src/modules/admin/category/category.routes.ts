@@ -46,7 +46,7 @@ router.get(
   "/:uuid",
   authenticate,
   authorizeRoles(ROLES.OWNER, ROLES.ADMIN, ROLES.CASHIER),
-  param("uuid").isUUID().withMessage("Categoria no valido"),
+  param("uuid").isUUID().withMessage("Categoria no valida"),
   handleInputErrors,
   CategoryController.getSubCategoriesByUuid,
 );
@@ -56,7 +56,7 @@ router.get(
   "/:categoryUuid/category",
   authenticate,
   authorizeRoles(ROLES.OWNER, ROLES.ADMIN, ROLES.CASHIER),
-  param("categoryUuid").isUUID().withMessage("Categoria no valido"),
+  param("categoryUuid").isUUID().withMessage("Categoria no valida"),
   handleInputErrors,
   CategoryController.getCategory,
 );
@@ -66,7 +66,7 @@ router.put(
   "/:categoryUuid/rootCategory",
   authenticate,
   authorizeRoles(ROLES.OWNER),
-  param("categoryUuid").isUUID().withMessage("Categoria no valido"),
+  param("categoryUuid").isUUID().withMessage("Categoria no valida"),
   body("name").notEmpty().withMessage("El nombre no puede ir vacio"),
   body("position").isNumeric().withMessage("Posicion no validá").toInt(),
   handleInputErrors,
@@ -79,8 +79,8 @@ router.put(
   authenticate,
   authorizeRoles(ROLES.OWNER),
   upload.single("image"),
-  param("rootCategory").isUUID().withMessage("Categoria no valido"),
-  param("subCategoryId").isUUID().withMessage("Categoria no valido"),
+  param("rootCategory").isUUID().withMessage("Categoria no valida"),
+  param("subCategoryId").isUUID().withMessage("Categoria no valida"),
   body("name").notEmpty().withMessage("El nombre no puede ir vacio"),
   body("description")
     .optional({ checkFalsy: true })
@@ -98,7 +98,7 @@ router.delete(
   "/:categoryUuid/rootCategory",
   authenticate,
   authorizeRoles(ROLES.OWNER),
-  param("categoryUuid").isUUID().withMessage("Categoria no valido"),
+  param("categoryUuid").isUUID().withMessage("Categoria no valida"),
   handleInputErrors,
   CategoryController.deleteRootCategory,
 );
@@ -108,8 +108,8 @@ router.delete(
   "/:rootCategory/rootCategory/:subCategoryId/subCategory",
   authenticate,
   authorizeRoles(ROLES.OWNER),
-  param("rootCategory").isUUID().withMessage("Categoria no valido"),
-  param("subCategoryId").isUUID().withMessage("Categoria no valido"),
+  param("rootCategory").isUUID().withMessage("Categoria no valida"),
+  param("subCategoryId").isUUID().withMessage("Categoria no valida"),
   handleInputErrors,
   CategoryController.deleteSubCategory,
 );

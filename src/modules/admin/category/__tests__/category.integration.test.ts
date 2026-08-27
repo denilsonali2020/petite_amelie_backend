@@ -1,13 +1,14 @@
 import request from "supertest";
 import app from "../../../../server.js";
 import { accessToken } from "../../../../__test__/helpers/auth.js";
+// import { describe, test, expect } from "@jest/globals";
 
 const categoryName = "Test Category Name";
 const rootCategoryUUID = "4ab89809-d343-4470-b241-daf85ab0f044";
 
 // Creating a new RootCategory
 describe("POST /api/category createCategory", () => {
-  test("creating a new rootCategory validation errors ", async () => {
+  test("create a category validation errors", async () => {
     const res = await request(app)
       .post("/api/category")
       .set("Authorization", `Bearer ${accessToken}`);
@@ -95,5 +96,44 @@ describe("GET /api/category/:uuid getSubCategoriesByUuid", () => {
 
     expect(res.status).toBe(401);
     expect(res.body.msg).toBe("No Autorizado");
+  });
+
+  test("validate an unvalid UUID", async () => {
+    const res = await request(app)
+      .get(`/api/category/hola-que-hace`)
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty("errors");
+  });
+});
+
+// get category by UUID
+describe("GET /api/category/:uuid/category getCategory", () => {
+  test("get a category by UUID", async () => {
+    const res = await request(app)
+      .get(`/api/category/${rootCategoryUUID}/category`)
+      .set("Authorization", `Bearer, ${accessToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.header["content-type"]).toMatch(/json/);
+  });
+
+  test("get a category no authentication", async () => {
+    const res = await request(app).get(
+      `/api/category/${rootCategoryUUID}/category`,
+    );
+
+    expect(res.status).toBe(401);
+    expect(res.body.msg).toBe("No Autorizado");
+  });
+
+  test("validation unvalid uuid", async () => {
+    const res = await request(app)
+      .get(`/api/category/hola-que-hace/category`)
+      .set("Authorization", `Bearer, ${accessToken}`);
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty("errors");
   });
 });
