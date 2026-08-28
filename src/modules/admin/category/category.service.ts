@@ -138,27 +138,18 @@ export const categoryService = {
       throw error;
     }
   },
-  //funciona pero se puede optimizar
+
   async updateSubCategory(
     rootCategory: category["uuid"],
     subCategoryId: category["uuid"],
     data: updateSubCategory,
   ) {
     try {
-      //validamos si el rootCategory existe
-      const rootCategoryExist = await prisma.category.findUnique({
-        where: { uuid: rootCategory },
-        select: { id: true },
-      });
-      if (!rootCategoryExist)
-        throw new HttpError("La categoria padre no existe", 404);
-
       //actualizamos la categoria donde este ese root category
       await prisma.category.update({
         where: { uuid: subCategoryId, parent: { uuid: rootCategory } },
         data: {
           ...data,
-          parentId: rootCategoryExist.id,
           imageURL: data.imageURL,
         },
       });
