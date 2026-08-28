@@ -18,6 +18,7 @@ import storeCategoryRoutes from "./modules/public/storeCategory/storeCategory.ro
 
 // import authRoutes from "../src/modules/auth/auth.routes.js"; //rutas de cliente pendiente
 import { corsConfig } from "./config/cors.js";
+import { multerErrorHandler } from "./middleware/validation.js";
 
 //Instancia de express
 const app = express();
@@ -48,5 +49,8 @@ app.use("/api/store/products", storeProductRoutes);
 app.use("/api/store/category", storeCategoryRoutes);
 
 // app.use("/api/auth", authRoutes); //rutas de cliente pendiente
+
+// Errores de multer
+app.use(multerErrorHandler);
 
 export default app;

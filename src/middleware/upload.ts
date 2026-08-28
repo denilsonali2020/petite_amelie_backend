@@ -1,6 +1,7 @@
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "../config/cloudinary.js";
+import type { Request } from "express";
 
 const storage = new CloudinaryStorage({
   cloudinary,
@@ -8,13 +9,13 @@ const storage = new CloudinaryStorage({
     return {
       folder: "petite_amelie",
       // Esta es la validación a nivel Cloudinary
-      allowed_formats: ["jpg", "png", "jpeg", "webp", "avif"],
+      allowed_formats: ["jpeg", "jpg", "png", "webp", "avif"],
     };
   },
 });
 
 // Esta función valida el archivo ANTES de subirlo
-const fileFilter = (req: any, file: Express.Multer.File, cb: any) => {
+const fileFilter = (req: Request, file: Express.Multer.File, cb: any) => {
   const allowedTypes = [
     "image/jpeg",
     "image/jpg",
@@ -30,7 +31,7 @@ const fileFilter = (req: any, file: Express.Multer.File, cb: any) => {
     // Si el formato es incorrecto, tiramos un error de Multer
     cb(
       new Error(
-        "Formato de imagen no permitido. Solo se aceptan JPG, PNG, WebP y AVIF.",
+        "Formato de imagen no permitido. Solo se aceptan JPEG JPG, PNG, WebP y AVIF.",
       ),
       false,
     );
