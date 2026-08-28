@@ -14,8 +14,10 @@ const baseCategoryName = `Test Base Category ${Date.now()}`;
 // relacionadas con subcategorías.
 let newRootCategoryUUID: string;
 const newCategoryName = `Test New Category ${Date.now()}`;
-const newSubCategoryName = `Test New Sub-Category ${Date.now()}`;
 
+// Sub-Categorias
+let newSubCategoryUUID: string;
+const newSubCategoryName = `Test New Sub-Category ${Date.now()}`;
 // Variables
 const notExistingUuid = "4ab89809-d343-4470-b241-daf85ab0f014";
 const imagePath = path.resolve(
@@ -120,6 +122,13 @@ describe("POST /api/category createCategory (subCategory)", () => {
       .attach("image", imagePath);
     expect(res.status).toBe(201);
     expect(res.text).toBe("Categoria creada!");
+
+    const category = await prisma.category.findFirst({
+      where: { name: newSubCategoryName },
+      select: { uuid: true },
+    });
+    if (!category) throw Error("La categoria no existe");
+    newSubCategoryUUID = category.uuid;
   });
 
   test("create a subCategory with invalid rootUuid", async () => {
@@ -310,6 +319,80 @@ describe("PUT /api/category/:uuid/rootCategory updateRootCategory", () => {
 
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty("errors");
+  });
+});
+
+// updateSubCategory
+describe("PUT /api/category/:root/rootCategory/:sub/subCategory updateSubCategory", () => {
+  test("update a subCategory", async () => {
+    const res = await request(app)
+      .put(
+        `/api/category/${newRootCategoryUUID}/rootCategory/${newSubCategoryUUID}/subCategory`,
+      )
+      .set("Authorization", `Bearer ${accessToken}`)
+      .field("name", newSubCategoryName)
+      .field("description", description)
+      .field("position", 77)
+      .attach("image", imagePath);
+
+    expect(res.status).toBe(200);
+    expect(res.text).toBe("Categoria actualizada!");
+  });
+
+  test("update a subCategory validation erros", async () => {
+    const res = await request(app)
+      .put(
+        `/api/category/${newRootCategoryUUID}/rootCategory/${newSubCategoryUUID}/subCategory`,
+      )
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty("errors");
+    expect(res.body.errors).toHaveLength(2);
+  });
+
+  test("update an inexisted Rootcategory from a sub-category", async () => {
+    const res = await request(app)
+      .put(
+        `/api/category/${notExistingUuid}/rootCategory/${newSubCategoryUUID}/subCategory`,
+      )
+      .set("Authorization", `Bearer ${accessToken}`)
+      .field("name", newSubCategoryName)
+      .field("description", description)
+      .field("position", 77)
+      .attach("image", imagePath);
+
+    expect(res.status).toBe(404);
+    expect(res.body).toHaveProperty("error");
+  });
+
+  test("update an inexisted subCategory", async () => {
+    const res = await request(app)
+      .put(
+        `/api/category/${newRootCategoryUUID}/rootCategory/${notExistingUuid}/subCategory`,
+      )
+      .set("Authorization", `Bearer ${accessToken}`)
+      .field("name", newSubCategoryName)
+      .field("description", description)
+      .field("position", 77)
+      .attach("image", imagePath);
+
+    expect(res.status).toBe(404);
+    expect(res.body).toHaveProperty("error");
+  });
+
+  test("update a subCategory no authorization", async () => {
+    const res = await request(app)
+      .put(
+        `/api/category/${newRootCategoryUUID}/rootCategory/${newSubCategoryUUID}/subCategory`,
+      )
+      .field("name", newSubCategoryName)
+      .field("description", description)
+      .field("position", 77)
+      .attach("image", imagePath);
+
+    expect(res.status).toBe(401);
+    expect(res.body.msg).toBe("No Autorizado");
   });
 });
 

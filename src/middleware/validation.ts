@@ -1,7 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { validationResult } from "express-validator";
 import multer from "multer";
-import { HttpError } from "../shared/errors/HttpError.js";
 
 export const handleInputErrors = (
   req: Request,
@@ -40,7 +39,5 @@ export const multerErrorHandler = (
     });
   }
 
-  return res.status(500).json({
-    error: "Error interno del servidor",
-  });
+  next(error);
 };
