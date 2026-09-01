@@ -347,8 +347,8 @@ export const orderService = {
         customerName: true,
         total: true,
         status: true,
-        deliveryType: true, 
-        shippingCost: true, 
+        deliveryType: true,
+        shippingCost: true,
         pointsEarned: true,
         createdAt: true,
         user: {
@@ -398,7 +398,10 @@ export const orderService = {
       });
     } catch (error: any) {
       if (error.code === "P2025")
-        throw new HttpError("La orden no existe", 404);
+        throw new HttpError(
+          "La orden no existe o no requiere informacion de envio",
+          404,
+        );
       if (error instanceof Prisma.PrismaClientValidationError) {
         throw new HttpError(
           "La información enviada contiene campos no permitidos o el formato es incorrecto.",

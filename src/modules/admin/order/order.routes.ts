@@ -84,6 +84,7 @@ router.post(
 router.get(
   "/",
   authenticate,
+  authorizeRoles(ROLES.OWNER, ROLES.ADMIN, ROLES.CASHIER),
   query("page")
     .isInt({ min: 1 })
     .toInt()
@@ -92,7 +93,7 @@ router.get(
     .isInt({ min: 10, max: 100 })
     .toInt()
     .withMessage("El límite debe ser un número entre 1 y 100"),
-  authorizeRoles(ROLES.OWNER, ROLES.ADMIN, ROLES.CASHIER),
+  handleInputErrors,
   OrderController.getOrders,
 );
 
@@ -101,6 +102,8 @@ router.get(
   "/:uuid",
   authenticate,
   authorizeRoles(ROLES.OWNER, ROLES.ADMIN, ROLES.CASHIER),
+  param("uuid").isUUID().withMessage("Orden no válida"),
+  handleInputErrors,
   OrderController.getOrder,
 );
 
@@ -109,6 +112,8 @@ router.post(
   "/:uuid/shipping",
   authenticate,
   authorizeRoles(ROLES.OWNER, ROLES.ADMIN, ROLES.CASHIER),
+  param("uuid").isUUID().withMessage("Orden no válida"),
+  handleInputErrors,
   OrderController.addShippingInfo,
 );
 
@@ -117,6 +122,7 @@ router.patch(
   "/:uuid/status",
   authenticate,
   authorizeRoles(ROLES.OWNER, ROLES.ADMIN, ROLES.CASHIER),
+  param("uuid").isUUID().withMessage("Orden no válida"),
   body("status")
     .isIn(ORDER_STATUS)
     .withMessage(`El estado debe ser: ${ORDER_STATUS.join(", ")}`),
