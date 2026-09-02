@@ -5,7 +5,7 @@ const version = packageJson.version;
 
 const swaggerOptions: swaggerJsdoc.Options = {
   definition: {
-    openapi: "3.2.0",
+    openapi: "3.1.0",
     info: {
       title: "REST API de con Express + TypeScript",
       version: version,

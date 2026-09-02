@@ -1,3 +1,7 @@
+info:
+  title: DOC for Category
+  version: 1.0.1
+openapi: 3.1.0
 components:
   schemas:
     Category:
@@ -18,6 +22,103 @@ components:
 
 paths:
   /api/category:
+    post:
+      tags:
+        - Category
+
+      summary: Crear una categoria raiz
+
+      description: Crea una nueva categoría.
+
+      security:
+        - bearerAuth: []
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+
+              properties:
+                name:
+                  type: string
+                  example: "Maquillaje"
+
+                position:
+                  type: integer
+                  example: 1
+
+              required:
+                - name
+                - position
+
+      responses:
+        "201":
+          description: Categoria creada!
+
+        "400":
+          description: Errores de validacion
+
+          content:
+            application/json:
+              schema:
+                type: object
+
+                properties:
+                  errors:
+                    type: array
+
+                    items:
+                      type: object
+
+                      properties:
+                        type:
+                          type: string
+                          example: "field"
+
+                        msg:
+                          type: string
+                          example: El nombre de la categoria no puede ir vacio
+
+                        path:
+                          type: string
+
+                        location:
+                          type: string
+
+                      required:
+                        - type
+                        - msg
+                        - path
+                        - location
+                required:
+                  - errors
+        "401":
+          description: Crear categoria sin estar autenticado
+
+          content:
+            application/json:
+              schema:
+                type: object
+
+                properties:
+                  msg:
+                    type: string
+                    example: No Autorizado
+
+        "409":
+          description: Conflicto con categoria con nombre duplicado
+
+          content:
+            application/json:
+              schema:
+                type: object
+
+                properties:
+                  error:
+                    type: string
+                    example: Ya existe una categoría con el nombre Cremas
+
     get:
       tags:
         - Category

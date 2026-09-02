@@ -56,6 +56,14 @@ app.use("/api/store/category", storeCategoryRoutes);
 app.use(multerErrorHandler);
 
 // Docs swagger
-app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use(
+  "/docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  }),
+);
 
 export default app;
