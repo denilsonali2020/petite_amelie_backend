@@ -1,0 +1,290 @@
+2. POST — plantilla completa
+
+Esta plantilla incluye POST con JSON y POST con FormData.
+
+# ============================================================
+# POST
+# ============================================================
+#
+# POST normalmente se utiliza para CREAR un recurso.
+#
+#
+# CASO 1: JSON
+# ------------------------------------------------------------
+#
+# Supertest:
+#
+# .post("/api/category")
+# .send({
+#   name: "Maquillaje",
+#   position: 1
+# })
+#
+# El backend recibe:
+#
+# req.body
+#
+# Content-Type:
+#
+# application/json
+#
+#
+# CASO 2: FORM-DATA
+# ------------------------------------------------------------
+#
+# Supertest:
+#
+# .post("/api/category")
+# .field("name", "Maquillaje")
+# .field("position", 1)
+# .attach("image", imagePath)
+#
+# Express:
+#
+# upload.single("image")
+#
+# Content-Type:
+#
+# multipart/form-data
+#
+#
+# IMPORTANTE:
+#
+# Si tu endpoint SOLO acepta JSON,
+# elimina multipart/form-data.
+#
+# Si tu endpoint SOLO acepta FormData,
+# elimina application/json.
+#
+# ============================================================
+
+
+paths:
+
+  /api/category:
+
+    post:
+
+      tags:
+        - Category
+
+      summary: Crear una categoría
+
+      description: Crea una nueva categoría.
+
+      # Eliminar si el endpoint es público.
+      security:
+        - bearerAuth: []
+
+
+      # -------------------------------------------------------
+      # BODY DE LA PETICIÓN
+      # -------------------------------------------------------
+
+      requestBody:
+
+        # Significa que el body es obligatorio.
+        required: true
+
+
+        content:
+
+          # ===================================================
+          # OPCIÓN 1 — JSON
+          # ===================================================
+          #
+          # Utilizar cuando haces:
+          #
+          # .send({...})
+          #
+          # o recibes:
+          #
+          # req.body
+          #
+          # con Content-Type application/json.
+          #
+
+          application/json:
+
+            schema:
+
+              # El body completo es un objeto.
+              type: object
+
+              # Campos que acepta el body.
+              properties:
+
+                name:
+                  type: string
+                  example: "Maquillaje"
+
+
+                description:
+                  type: string
+                  example: "Productos relacionados con maquillaje"
+
+
+                position:
+                  type: integer
+                  minimum: 1
+                  example: 1
+
+
+              # Campos que obligatoriamente deben enviarse.
+              required:
+                - name
+                - position
+
+
+
+          # ===================================================
+          # OPCIÓN 2 — FORM-DATA
+          # ===================================================
+          #
+          # Utilizar cuando haces:
+          #
+          # .field(...)
+          # .attach(...)
+          #
+          # o utilizas:
+          #
+          # upload.single("image")
+          #
+          # Si tu endpoint NO utiliza FormData,
+          # elimina esta sección completa.
+          #
+
+          multipart/form-data:
+
+            schema:
+              type: object
+
+              properties:
+
+                # Campo normal del FormData.
+                name:
+                  type: string
+                  example: "Maquillaje"
+
+
+                description:
+                  type: string
+                  example: "Productos relacionados con maquillaje"
+
+
+                position:
+                  type: integer
+                  minimum: 1
+                  example: 1
+
+
+                parentId:
+                  type: string
+                  format: uuid
+
+                  example: "4ab89809-d343-4470-b241-daf85ab0f014"
+
+
+                # ---------------------------------------------
+                # ARCHIVO
+                # ---------------------------------------------
+                #
+                # Representa:
+                #
+                # upload.single("image")
+                #
+                # o:
+                #
+                # .attach("image", imagePath)
+                #
+                # Swagger UI mostrará un selector de archivos.
+                #
+                image:
+                  type: string
+                  format: binary
+
+
+              required:
+                - name
+                - position
+
+
+      # -------------------------------------------------------
+      # RESPUESTAS
+      # -------------------------------------------------------
+
+      responses:
+
+        # RECURSO CREADO
+        "201":
+          description: Categoría creada correctamente
+
+
+          # ---------------------------------------------------
+          # OPCIÓN A:
+          #
+          # Si el backend devuelve JSON:
+          #
+          # {
+          #   "uuid": "...",
+          #   "name": "Maquillaje"
+          # }
+          #
+          # usa:
+          # ---------------------------------------------------
+
+          content:
+            application/json:
+
+              schema:
+                $ref: "#/components/schemas/Category"
+
+
+          # ---------------------------------------------------
+          # OPCIÓN B:
+          #
+          # Si tu backend hace:
+          #
+          # res.status(201).send("Categoria creada!");
+          #
+          # REEMPLAZA application/json por:
+          #
+          # content:
+          #   text/plain:
+          #     schema:
+          #       type: string
+          #       example: "Categoria creada!"
+          #
+          # ---------------------------------------------------
+
+
+        # ERROR DE VALIDACIÓN
+        "400":
+          description: Datos enviados inválidos
+
+
+        # NO AUTENTICADO
+        "401":
+          description: No autorizado
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+
+
+        # CONFLICTO DE NEGOCIO
+        #
+        # Por ejemplo:
+        # categoría duplicada.
+        "409":
+          description: Ya existe una categoría con esos datos
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+
+        "500":
+          description: Error interno del servidor

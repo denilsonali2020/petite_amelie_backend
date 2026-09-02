@@ -1,0 +1,149 @@
+5. DELETE — plantilla completa
+
+Normalmente DELETE no necesita body. Identifica el recurso mediante un parámetro.
+
+# ============================================================
+# DELETE
+# ============================================================
+#
+# DELETE se utiliza para ELIMINAR un recurso.
+#
+#
+# Ejemplo Express:
+#
+# router.delete(
+#   "/:uuid/rootCategory",
+#   authenticate,
+#   CategoryController.deleteRootCategory
+# );
+#
+#
+# Como en server.ts tienes:
+#
+# app.use("/api/category", categoryRoutes);
+#
+#
+# Ruta final Express:
+#
+# DELETE /api/category/:uuid/rootCategory
+#
+#
+# OpenAPI:
+#
+# DELETE /api/category/{uuid}/rootCategory
+#
+#
+# Normalmente DELETE NO necesita requestBody.
+#
+# El recurso se identifica mediante:
+#
+# req.params.uuid
+#
+# ============================================================
+
+
+paths:
+
+  /api/category/{uuid}/rootCategory:
+
+    delete:
+
+      tags:
+        - Category
+
+      summary: Eliminar una categoría principal
+
+      description: Elimina una categoría utilizando su UUID.
+
+      security:
+        - bearerAuth: []
+
+
+      # -------------------------------------------------------
+      # PARÁMETRO DE LA URL
+      # -------------------------------------------------------
+
+      parameters:
+
+        - name: uuid
+
+          # Representa:
+          #
+          # req.params.uuid
+          #
+          in: path
+
+          required: true
+
+          description: UUID de la categoría que se desea eliminar
+
+          schema:
+            type: string
+            format: uuid
+
+          example: "4ab89809-d343-4470-b241-daf85ab0f014"
+
+
+      # -------------------------------------------------------
+      # RESPUESTAS
+      # -------------------------------------------------------
+
+      responses:
+
+        # ELIMINACIÓN CORRECTA
+        "200":
+          description: Categoría eliminada correctamente
+
+
+          # Si tu backend hace:
+          #
+          # res.send("Categoria Eliminada!");
+          #
+          content:
+            text/plain:
+
+              schema:
+                type: string
+
+                example: "Categoria Eliminada!"
+
+
+        # UUID INVÁLIDO
+        "400":
+          description: UUID inválido
+
+
+        # NO AUTENTICADO
+        "401":
+          description: No autorizado
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+
+
+        # RECURSO NO EXISTE
+        "404":
+          description: La categoría no existe
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+
+        # CONFLICTO DE NEGOCIO
+        #
+        # Por ejemplo:
+        #
+        # no permitir eliminar una categoría porque
+        # todavía tiene subcategorías relacionadas.
+        #
+        "409":
+          description: La categoría no puede eliminarse porque tiene recursos relacionados
+
+
+        # ERROR INESPERADO
+        "500":
+          description: Error interno del servidor

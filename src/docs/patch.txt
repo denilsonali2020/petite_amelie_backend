@@ -1,0 +1,161 @@
+4. PATCH — plantilla completa
+
+PATCH normalmente modifica solo una parte específica.
+
+# ============================================================
+# PATCH
+# ============================================================
+#
+# PATCH normalmente se utiliza para una ACTUALIZACIÓN PARCIAL.
+#
+# Ejemplo:
+#
+# PATCH /api/category/:uuid/status
+#
+# Body:
+#
+# {
+#   "status": "ACTIVE"
+# }
+#
+#
+# Express:
+#
+# router.patch("/:uuid/status", ...)
+#
+#
+# En el backend:
+#
+# req.params.uuid
+# req.body.status
+#
+#
+# DIFERENCIA MENTAL:
+#
+# PUT:
+# normalmente actualiza una representación completa/importante.
+#
+# PATCH:
+# normalmente modifica solamente algunos campos.
+#
+# ============================================================
+
+
+paths:
+
+  /api/category/{uuid}/status:
+
+    patch:
+
+      tags:
+        - Category
+
+      summary: Actualizar estado de una categoría
+
+      description: Modifica únicamente el estado de una categoría existente.
+
+      security:
+        - bearerAuth: []
+
+
+      # -------------------------------------------------------
+      # PARÁMETRO DE LA URL
+      # -------------------------------------------------------
+
+      parameters:
+
+        - name: uuid
+
+          # Representa:
+          #
+          # req.params.uuid
+          #
+          in: path
+
+          required: true
+
+          description: UUID de la categoría
+
+          schema:
+            type: string
+            format: uuid
+
+
+      # -------------------------------------------------------
+      # BODY
+      # -------------------------------------------------------
+
+      requestBody:
+
+        required: true
+
+        content:
+
+          # Normalmente una actualización parcial
+          # de datos simples puede utilizar JSON.
+          application/json:
+
+            schema:
+              type: object
+
+              properties:
+
+                status:
+                  type: string
+
+                  # enum permite indicar cuáles valores
+                  # acepta exactamente tu backend.
+                  enum:
+                    - ACTIVE
+                    - INACTIVE
+
+                  example: "ACTIVE"
+
+
+              required:
+                - status
+
+
+      # -------------------------------------------------------
+      # RESPUESTAS
+      # -------------------------------------------------------
+
+      responses:
+
+        "200":
+          description: Categoría actualizada correctamente
+
+
+        # Datos o UUID inválido.
+        "400":
+          description: UUID o información enviada inválida
+
+
+        "401":
+          description: No autorizado
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+
+
+        # Recurso inexistente.
+        "404":
+          description: La categoría no existe
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+
+        # Ejemplo:
+        # intentar realizar un cambio de estado
+        # que la lógica del negocio no permite.
+        "409":
+          description: La modificación solicitada no está permitida
+
+
+        "500":
+          description: Error interno del servidor

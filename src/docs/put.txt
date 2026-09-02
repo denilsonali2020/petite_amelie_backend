@@ -1,0 +1,250 @@
+3. PUT — plantilla completa
+
+También incluye PUT JSON y PUT FormData.
+
+# ============================================================
+# PUT
+# ============================================================
+#
+# PUT normalmente se utiliza para ACTUALIZAR un recurso.
+#
+# Puede tener:
+#
+# - parámetro en URL
+# - requestBody
+# - JSON
+# - FormData
+# - archivos
+#
+#
+# EJEMPLO JSON:
+#
+# .put(`/api/category/${uuid}/rootCategory`)
+# .send({
+#   name: "Maquillaje actualizado",
+#   position: 5
+# })
+#
+#
+# EJEMPLO FORM-DATA:
+#
+# .put(`/api/category/${uuid}/rootCategory`)
+# .field("name", "Maquillaje actualizado")
+# .field("position", 5)
+# .attach("image", imagePath)
+#
+#
+# IMPORTANTE:
+#
+# Si el endpoint acepta SOLO JSON,
+# elimina multipart/form-data.
+#
+# Si acepta SOLO FormData,
+# elimina application/json.
+#
+# ============================================================
+
+
+paths:
+
+  /api/category/{uuid}/rootCategory:
+
+    put:
+
+      tags:
+        - Category
+
+      summary: Actualizar una categoría principal
+
+      description: Actualiza la información de una categoría existente.
+
+      security:
+        - bearerAuth: []
+
+
+      # -------------------------------------------------------
+      # PARÁMETROS DE LA URL
+      # -------------------------------------------------------
+
+      parameters:
+
+        - name: uuid
+
+          # Representa:
+          #
+          # req.params.uuid
+          #
+          in: path
+
+          required: true
+
+          description: UUID de la categoría que se desea actualizar
+
+          schema:
+            type: string
+            format: uuid
+
+          example: "4ab89809-d343-4470-b241-daf85ab0f014"
+
+
+      # -------------------------------------------------------
+      # BODY
+      # -------------------------------------------------------
+
+      requestBody:
+
+        required: true
+
+        content:
+
+
+          # ===================================================
+          # OPCIÓN 1 — JSON
+          # ===================================================
+          #
+          # Supertest:
+          #
+          # .send({...})
+          #
+
+          application/json:
+
+            schema:
+              type: object
+
+              properties:
+
+                name:
+                  type: string
+                  example: "Maquillaje actualizado"
+
+
+                description:
+                  type: string
+                  example: "Descripción actualizada"
+
+
+                position:
+                  type: integer
+                  minimum: 1
+                  example: 5
+
+
+              required:
+                - name
+                - position
+
+
+
+          # ===================================================
+          # OPCIÓN 2 — FORM-DATA
+          # ===================================================
+          #
+          # Supertest:
+          #
+          # .field(...)
+          # .attach(...)
+          #
+          # Express:
+          #
+          # upload.single("image")
+          #
+
+          multipart/form-data:
+
+            schema:
+              type: object
+
+              properties:
+
+                name:
+                  type: string
+                  example: "Maquillaje actualizado"
+
+
+                description:
+                  type: string
+                  example: "Descripción actualizada"
+
+
+                position:
+                  type: integer
+                  minimum: 1
+                  example: 5
+
+
+                # Archivo opcional para reemplazar
+                # la imagen anterior.
+                image:
+                  type: string
+                  format: binary
+
+
+              required:
+                - name
+                - position
+
+
+      # -------------------------------------------------------
+      # RESPUESTAS
+      # -------------------------------------------------------
+
+      responses:
+
+        # ACTUALIZACIÓN CORRECTA
+        "200":
+          description: Categoría actualizada correctamente
+
+
+          # Si tu backend hace:
+          #
+          # res.send("Categoria actualizada!");
+          #
+          content:
+            text/plain:
+
+              schema:
+                type: string
+                example: "Categoria actualizada!"
+
+
+          # Si en lugar de texto devuelve el objeto actualizado,
+          # puedes reemplazarlo por:
+          #
+          # content:
+          #   application/json:
+          #     schema:
+          #       $ref: "#/components/schemas/Category"
+
+
+        # UUID O BODY INVÁLIDO
+        "400":
+          description: UUID o información enviada inválida
+
+
+        "401":
+          description: No autorizado
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+
+
+        # EL RECURSO NO EXISTE
+        "404":
+          description: La categoría no existe
+
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+
+        # CONFLICTO
+        "409":
+          description: Conflicto con la información enviada
+
+
+        "500":
+          description: Error interno del servidor

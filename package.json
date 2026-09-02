@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --exec tsx src/index.ts",
-    "dev:api": "DOTENV_CONFIG_QUIET=true nodemon --exec tsx src/index.ts --api",
+    "dev:api": "DOTENV_CONFIG_QUIET=true nodemon --ext ts,json,yaml,yml --exec tsx src/index.ts --api",
     "seed": "prisma db seed",
     "build": "prisma generate && tsc -p tsconfig.build.json && cp -R src/generated dist/generated",
     "start": "node dist/index.js",
@@ -31,7 +31,9 @@
     "multer-storage-cloudinary": "^4.0.0",
     "nodemailer": "^7.0.13",
     "pg": "^8.17.2",
-    "socket.io": "^4.8.3"
+    "socket.io": "^4.8.3",
+    "swagger-jsdoc": "^6.3.0",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
@@ -45,6 +47,8 @@
     "@types/nodemailer": "^7.0.9",
     "@types/pg": "^8.16.0",
     "@types/supertest": "^7.2.1",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
     "jest": "^30.4.2",
     "nodemon": "^3.1.11",
     "prisma": "^7.3.0",

@@ -1,0 +1,49 @@
+components:
+  schemas:
+    Category:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          example: "4ab89809-d343-4470-b241-daf85ab0f014"
+
+        name:
+          type: string
+          example: "Maquillaje"
+
+        position:
+          type: integer
+          example: 1
+
+paths:
+  /api/category:
+    get:
+      tags:
+        - Category
+
+      summary: Obtener categorías principales
+
+      security:
+        - bearerAuth: []
+
+      responses:
+        "200":
+          description: Lista de categorías obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+
+        "401":
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+                    example: "No Autorizado"

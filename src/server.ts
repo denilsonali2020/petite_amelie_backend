@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./config/swagger.js";
 
 import categoryRoutes from "./modules/admin/category/category.routes.js";
 import productRoutes from "./modules/admin/product/product.routes.js";
@@ -52,5 +54,8 @@ app.use("/api/store/category", storeCategoryRoutes);
 
 // Errores de multer
 app.use(multerErrorHandler);
+
+// Docs swagger
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 export default app;
