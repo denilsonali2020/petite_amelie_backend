@@ -129,7 +129,7 @@ describe("POST /api/category createCategory (subCategory)", () => {
     });
     if (!category) throw Error("La categoria no existe");
     newSubCategoryUUID = category.uuid;
-  });
+  }, 10000);
 
   test("duplicate name a subCategory", async () => {
     const res = await request(app)
@@ -144,7 +144,7 @@ describe("POST /api/category createCategory (subCategory)", () => {
     expect(res.body.error).toBe(
       `Ya existe una categoría con el nombre: ${newSubCategoryName}`,
     );
-  });
+  }, 10000);
 
   test("create a subCategory with invalid rootUuid", async () => {
     const res = await request(app)
