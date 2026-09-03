@@ -1,32 +1,45 @@
+# CONTROL DE VERSIONES
 info:
   title: DOC for Category
   version: 1.0.1
 openapi: 3.1.0
 components:
-  schemas:
-    Category:
-      type: object
-      properties:
-        uuid:
-          type: string
-          format: uuid
-          example: "4ab89809-d343-4470-b241-daf85ab0f014"
+  responses:
+    # Peticion sin estar autenticado
+    Unauthorized:
+      description: Usuario no autenticado
+      content:
+        application/json:
+          schema:
+            type: object
 
-        name:
-          type: string
-          example: "Maquillaje"
+            properties:
+              msg:
+                type: string
+                example: No Autorizado
 
-        position:
-          type: integer
-          example: 1
+    # Recurso no encontrado
+    NotFoundResource:
+      description: Error por categoria raiz no encontrada
+      content:
+        application/json:
+          schema:
+            type: object
 
+            properties:
+              error:
+                type: string
+                example: Recurso no encontrado
+
+# RUTAS DE CATEGORIA
 paths:
   /api/category:
+    # createCategory (rootCategory)
     post:
       tags:
         - Category
 
-      summary: Crear una categoria raiz
+      summary: Crear una categoria raiz - createCategory (rootCategory)
 
       description: Crea una nueva categoría.
 
@@ -74,7 +87,7 @@ paths:
                       properties:
                         type:
                           type: string
-                          example: "field"
+                          example: field
 
                         msg:
                           type: string
@@ -93,18 +106,9 @@ paths:
                         - location
                 required:
                   - errors
+
         "401":
-          description: Crear categoria sin estar autenticado
-
-          content:
-            application/json:
-              schema:
-                type: object
-
-                properties:
-                  msg:
-                    type: string
-                    example: No Autorizado
+          $ref: "#/components/responses/Unauthorized"
 
         "409":
           description: Conflicto con categoria con nombre duplicado
@@ -119,11 +123,12 @@ paths:
                     type: string
                     example: Ya existe una categoría con el nombre Cremas
 
+    # getRootCategories
     get:
       tags:
         - Category
 
-      summary: Obtener categorías principales
+      summary: Obtener categorías principales - getRootCategories
 
       security:
         - bearerAuth: []
@@ -136,15 +141,237 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Category"
+                  type: object
+                  properties:
+                    uuid:
+                      type: string
+                      example: 4ab89809-d343-4470-b241-daf85ab0f014
+                    name:
+                      type: string
+                      example: Maquillaje
+                    position:
+                      type: number
+                      example: 1
 
         "401":
-          description: No autorizado
+          $ref: "#/components/responses/Unauthorized"
+
+  /api/category/{uuid}:
+    # getSubCategoriesByUuid
+    get:
+      tags:
+        - Category
+
+      summary: Obtener las sub-categorias de una categoria raiz - getSubCategoriesByUuid
+
+      description: Obtiene una categoría específica utilizando su UUID.
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          description: UUID de la categoria raiz
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        "200":
+          description: Lista las subcategorias de una categoria raiz
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  msg:
+                  name:
                     type: string
-                    example: "No Autorizado"
+                    example: Cremas
+
+                  children:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        uuid:
+                          type: string
+                          example: 0033e201-2606-4f86-972c-6183de9e8798
+                        name:
+                          type: string
+                          example: Cremas Faciales
+                        description:
+                          type: string
+                          example: Cremas de con ingredientes puros, que garantisan el cuidado maximo
+                        position:
+                          type: number
+                          example: 1
+                        imageURL:
+                          type: string
+                          example: https://res.cloudinary.com/daxosw10b/image/upload/v1776179700/petite_amelie/qhctgp4bwwlhmayhfpbz.webp
+
+        "400":
+          description: Error uuid invalido de una categoria
+
+          content:
+            application/json:
+              schema:
+                type: object
+
+                properties:
+                  errors:
+                    type: array
+
+                    items:
+                      type: object
+
+                      properties:
+                        type:
+                          type: string
+                          example: field
+
+                        value:
+                          type: string
+                          example: hola-que-hace
+
+                        msg:
+                          type: string
+                          example: Categoria no valida
+
+                        path:
+                          type: string
+
+                        location:
+                          type: string
+
+                      required:
+                        - type
+                        - value
+                        - msg
+                        - path
+                        - location
+                required:
+                  - errors
+
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+        "404":
+          description: Error por categoria raiz no encontrada
+
+          content:
+            application/json:
+              schema:
+                type: object
+
+                properties:
+                  error:
+                    type: string
+                    example: La categoria no existe
+
+  /api/category/{categoryUuid}/category:
+    # getCategory
+    get:
+      tags:
+        - Category
+
+      summary: Obtener una categoria para categorias raiz y sub-categorias - getCategory
+
+      description: Obtiene una categoria por su uuid
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - name: categoryUuid
+          in: path
+          required: true
+          description: UUID de la categoria
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        "200":
+          description: Informacion general de categorias
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    example: Cremas Faciales
+                  position:
+                    type: number
+                    example: 1
+                  imageURL:
+                    type:
+                      - string
+                      - "null"
+                    example: https://res.cloudinary.com/daxosw10b/image/upload/v1776179700/petite_amelie/qhctgp4bwwlhmayhfpbz.webp
+                  description:
+                    type:
+                      - string
+                      - "null"
+                    example: Cremas de con ingredientes puros, que garantisan el cuidado maximo
+
+        "400":
+          description: Error uuid invalido de una categoria
+
+          content:
+            application/json:
+              schema:
+                type: object
+
+                properties:
+                  errors:
+                    type: array
+
+                    items:
+                      type: object
+
+                      properties:
+                        type:
+                          type: string
+                          example: field
+
+                        value:
+                          type: string
+                          example: hola-que-hace
+
+                        msg:
+                          type: string
+                          example: Categoria no valida
+
+                        path:
+                          type: string
+
+                        location:
+                          type: string
+
+                      required:
+                        - type
+                        - value
+                        - msg
+                        - path
+                        - location
+                required:
+                  - errors
+
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+        "404":
+          description: Error por categoria que no existe
+
+          content:
+            application/json:
+              schema:
+                type: object
+
+                properties:
+                  error:
+                    type: string
+                    example: La categoria no existe

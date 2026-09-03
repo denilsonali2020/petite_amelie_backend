@@ -218,13 +218,13 @@ describe("GET /api/category/:uuid getSubCategoriesByUuid", () => {
     expect(Array.isArray(res.body.children)).toBe(true);
   });
 
-  test("get sub-categories from an inexistent rootCategory", async () => {
+  test("validate an invalid UUID", async () => {
     const res = await request(app)
-      .get(`/api/category/4ab89809-d343-4470-b241-daf85ab0f041`)
+      .get(`/api/category/hola-que-hace`)
       .set("Authorization", `Bearer ${accessToken}`);
 
-    expect(res.status).toBe(404);
-    expect(res.body.error).toBe("La categoria no existe");
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty("errors");
   });
 
   test("get sub-categories from rootCategory no authorization", async () => {
@@ -234,13 +234,13 @@ describe("GET /api/category/:uuid getSubCategoriesByUuid", () => {
     expect(res.body.msg).toBe("No Autorizado");
   });
 
-  test("validate an invalid UUID", async () => {
+  test("get sub-categories from an inexistent rootCategory", async () => {
     const res = await request(app)
-      .get(`/api/category/hola-que-hace`)
+      .get(`/api/category/4ab89809-d343-4470-b241-daf85ab0f041`)
       .set("Authorization", `Bearer ${accessToken}`);
 
-    expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty("errors");
+    expect(res.status).toBe(404);
+    expect(res.body.error).toBe("La categoria no existe");
   });
 });
 
@@ -256,13 +256,13 @@ describe("GET /api/category/:uuid/category getCategory", () => {
     expect(res.body).toHaveProperty("name");
   });
 
-  test("inexistent category by uuid", async () => {
+  test("validation invalid uuid", async () => {
     const res = await request(app)
-      .get(`/api/category/${notExistingUuid}/category`)
+      .get(`/api/category/hola-que-hace/category`)
       .set("Authorization", `Bearer ${accessToken}`);
 
-    expect(res.status).toBe(404);
-    expect(res.body.error).toBe("La categoria no existe");
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty("errors");
   });
 
   test("get a category no authentication", async () => {
@@ -274,13 +274,13 @@ describe("GET /api/category/:uuid/category getCategory", () => {
     expect(res.body.msg).toBe("No Autorizado");
   });
 
-  test("validation invalid uuid", async () => {
+  test("inexistent category by uuid", async () => {
     const res = await request(app)
-      .get(`/api/category/hola-que-hace/category`)
+      .get(`/api/category/${notExistingUuid}/category`)
       .set("Authorization", `Bearer ${accessToken}`);
 
-    expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty("errors");
+    expect(res.status).toBe(404);
+    expect(res.body.error).toBe("La categoria no existe");
   });
 });
 
