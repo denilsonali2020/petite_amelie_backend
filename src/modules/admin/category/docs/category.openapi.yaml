@@ -18,19 +18,6 @@ components:
                 type: string
                 example: No Autorizado
 
-    # Recurso no encontrado
-    NotFoundResource:
-      description: Error por categoria raiz no encontrada
-      content:
-        application/json:
-          schema:
-            type: object
-
-            properties:
-              error:
-                type: string
-                example: Recurso no encontrado
-
 # RUTAS DE CATEGORIA
 paths:
   /api/category:
