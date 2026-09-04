@@ -75,11 +75,10 @@ router.put(
 
 //actualizar subCategory
 router.put(
-  "/:rootCategory/rootCategory/:subCategoryId/subCategory",
+  "/:subCategoryId/subCategory",
   authenticate,
   authorizeRoles(ROLES.OWNER),
   upload.single("image"),
-  param("rootCategory").isUUID().withMessage("Categoria no valida"),
   param("subCategoryId").isUUID().withMessage("Categoria no valida"),
   body("name").notEmpty().withMessage("El nombre no puede ir vacio"),
   body("description")

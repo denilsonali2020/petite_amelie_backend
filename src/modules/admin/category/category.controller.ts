@@ -74,15 +74,14 @@ export class CategoryController {
 
   static updateSubCategory = async (
     req: Request<{
-      rootCategory: Category["uuid"];
       subCategoryId: Category["uuid"];
     }>,
     res: Response,
   ) => {
     try {
       const imageURL = req.file?.path || req.body.imageURL || null;
-      const { rootCategory, subCategoryId } = req.params;
-      await categoryService.updateSubCategory(rootCategory, subCategoryId, {
+      const { subCategoryId } = req.params;
+      await categoryService.updateSubCategory(subCategoryId, {
         ...req.body,
         imageURL,
       });

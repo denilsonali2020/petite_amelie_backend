@@ -18,6 +18,19 @@ components:
                 type: string
                 example: No Autorizado
 
+    # Peticion cuando no encuentra una categoria en la DB
+    Inexisted:
+      description: Categoria no encontrada
+      content:
+        application/json:
+          schema:
+            type: object
+
+            properties:
+              error:
+                type: string
+                example: La categoria no existe
+
 # RUTAS DE CATEGORIA
 paths:
   /api/category:
@@ -54,7 +67,13 @@ paths:
 
       responses:
         "201":
-          description: Categoria creada!
+          description: Mensaje de exito
+
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Categoria creada!
 
         "400":
           description: Errores de validacion
@@ -245,17 +264,7 @@ paths:
           $ref: "#/components/responses/Unauthorized"
 
         "404":
-          description: Error por categoria raiz no encontrada
-
-          content:
-            application/json:
-              schema:
-                type: object
-
-                properties:
-                  error:
-                    type: string
-                    example: La categoria no existe
+          $ref: "#/components/responses/Inexisted"
 
   /api/category/{categoryUuid}/category:
     # getCategory
@@ -263,7 +272,7 @@ paths:
       tags:
         - Category
 
-      summary: Obtener una categoria para categorias raiz y sub-categorias - getCategory
+      summary: Obtener una categoria - getCategory
 
       description: Obtiene una categoria por su uuid
 
@@ -351,7 +360,56 @@ paths:
           $ref: "#/components/responses/Unauthorized"
 
         "404":
-          description: Error por categoria que no existe
+          $ref: "#/components/responses/Inexisted"
+
+  /api/category/{categoryUuid}/rootCategory:
+    # updateRootCategory
+    put:
+      tags:
+        - Category
+
+      summary: Actualiza una categoria raiz - updateRootCategory
+
+      description: Actualiza una rootCategory por su uuid
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - name: categoryUuid
+          in: path
+          required: true
+          description: UUID de la categoria
+          schema:
+            type: string
+            format: uuid
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+
+              properties:
+                name:
+                  type: string
+                  example: Cremas Actualizado
+                position:
+                  type: number
+                  example: 2
+
+      responses:
+        "200":
+          description: Mensaje de exito
+
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Categoria actualizada!
+
+        "400":
+          description: Comprueba errors de validacion formulario
 
           content:
             application/json:
@@ -359,6 +417,172 @@ paths:
                 type: object
 
                 properties:
-                  error:
-                    type: string
-                    example: La categoria no existe
+                  errors:
+                    type: array
+
+                    items:
+                      type: object
+
+                      properties:
+                        type:
+                          type: string
+                        value:
+                          type: string
+                        msg:
+                          type: string
+                        path:
+                          type: string
+                        location:
+                          type: string
+
+                      required:
+                        - type
+                        - msg
+                        - path
+                        - location
+
+                required:
+                  - errors
+
+              examples:
+                validationBody:
+                  summary: Errores de validación del body
+                  value:
+                    errors:
+                      - type: field
+                        msg: El nombre no puede ir vacio
+                        path: name
+                        location: body
+
+                      - type: field
+                        msg: La posicion debe ser un numero
+                        path: position
+                        location: body
+
+                invalidUUID:
+                  summary: Error por uuid invalido
+                  value:
+                    errors:
+                      - type: field
+                        value: uuid_ingresado
+                        msg: Categoria no valida
+                        path: categoryUuid
+                        location: params
+
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+        "404":
+          $ref: "#/components/responses/Inexisted"
+
+  /api/category/{subCategoryId}/subCategory:
+    # updateSubCategory
+    put:
+      tags:
+        - Category
+
+      summary: Actualiza una sub-categoria
+
+      description: Actualiza una subCategory por su uuid
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - name: subCategoryId
+          in: path
+          required: true
+          description: UUID de la sub-categoria
+          schema:
+            type: string
+            format: uuid
+
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Cremas - Actualizado
+
+                image:
+                  type: string
+                  format: binary
+
+                description:
+                  type: string
+                  example: Cremas de acuerdo con tu sensibilidad en tu piel, producto exelente
+                  minimum: 50
+                  maximum: 90
+
+                position:
+                  type: number
+                  example: 1
+
+              required:
+                - name
+                - image
+                - description
+                - position
+
+      responses:
+        "200":
+          description: Mensaje de exito
+
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Categoria actualizada!
+
+        "400":
+          description: Errores de validacion de formulario
+          content:
+            application/json:
+              schema:
+                type: object
+
+                properties:
+                  errors:
+                    type: array
+
+                    items:
+                      type: object
+
+                      properties:
+                        type:
+                          type: string
+                        msg:
+                          type: string
+                        path:
+                          type: string
+                        location:
+                          type: string
+
+                      required:
+                        - type
+                        - msg
+                        - path
+                        - location
+
+                required:
+                  - errors
+                example:
+                  errors:
+                    - type: field
+                      msg: El nombre no puede ir vacio
+                      path: name
+                      location: body
+
+                    - type: field
+                      msg: Posicion no validá
+                      path: position
+                      location: body
+
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+        "404":
+          $ref: "#/components/responses/Inexisted"

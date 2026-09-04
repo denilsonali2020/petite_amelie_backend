@@ -49,7 +49,6 @@ beforeAll(async () => {
   if (!category) {
     throw new Error("Test category could not be created");
   }
-
   rootCategoryUUID = category.uuid;
 });
 
@@ -296,15 +295,6 @@ describe("PUT /api/category/:uuid/rootCategory updateRootCategory", () => {
     expect(res.text).toBe("Categoria actualizada!");
   });
 
-  test("update a rootCategory no authorization", async () => {
-    const res = await request(app)
-      .put(`/api/category/${rootCategoryUUID}/rootCategory`)
-      .send({ name: newCategoryName + " actualizada", position: 33 });
-
-    expect(res.status).toBe(401);
-    expect(res.body.msg).toBe("No Autorizado");
-  });
-
   test("update a rootCategory validation errors", async () => {
     const res = await request(app)
       .put(`/api/category/${rootCategoryUUID}/rootCategory`)
@@ -316,16 +306,6 @@ describe("PUT /api/category/:uuid/rootCategory updateRootCategory", () => {
     expect(res.body.errors).toHaveLength(2);
   });
 
-  test("update an inexistent rootCategory", async () => {
-    const res = await request(app)
-      .put(`/api/category/${notExistingUuid}/rootCategory`)
-      .set("Authorization", `Bearer ${accessToken}`)
-      .send({ name: newCategoryName + " actualizada", position: 33 });
-
-    expect(res.status).toBe(404);
-    expect(res.body.error).toBe("La categoria no existe");
-  });
-
   test("update an invalid rootCategory", async () => {
     const res = await request(app)
       .put(`/api/category/hola-que-hace/rootCategory`)
@@ -335,15 +315,32 @@ describe("PUT /api/category/:uuid/rootCategory updateRootCategory", () => {
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty("errors");
   });
+
+  test("update a rootCategory no authorization", async () => {
+    const res = await request(app)
+      .put(`/api/category/${rootCategoryUUID}/rootCategory`)
+      .send({ name: newCategoryName + " actualizada", position: 33 });
+
+    expect(res.status).toBe(401);
+    expect(res.body.msg).toBe("No Autorizado");
+  });
+
+  test("update an inexistent rootCategory", async () => {
+    const res = await request(app)
+      .put(`/api/category/${notExistingUuid}/rootCategory`)
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({ name: newCategoryName + " actualizada", position: 33 });
+
+    expect(res.status).toBe(404);
+    expect(res.body.error).toBe("La categoria no existe");
+  });
 });
 
 // updateSubCategory
-describe("PUT /api/category/:root/rootCategory/:sub/subCategory updateSubCategory", () => {
+describe("PUT /api/category/:sub/subCategory updateSubCategory", () => {
   test("update a subCategory", async () => {
     const res = await request(app)
-      .put(
-        `/api/category/${newRootCategoryUUID}/rootCategory/${newSubCategoryUUID}/subCategory`,
-      )
+      .put(`/api/category/${newSubCategoryUUID}/subCategory`)
       .set("Authorization", `Bearer ${accessToken}`)
       .field("name", newSubCategoryName)
       .field("description", description)
@@ -356,9 +353,7 @@ describe("PUT /api/category/:root/rootCategory/:sub/subCategory updateSubCategor
 
   test("update a subCategory validation erros", async () => {
     const res = await request(app)
-      .put(
-        `/api/category/${newRootCategoryUUID}/rootCategory/${newSubCategoryUUID}/subCategory`,
-      )
+      .put(`/api/category/${newSubCategoryUUID}/subCategory`)
       .set("Authorization", `Bearer ${accessToken}`);
 
     expect(res.status).toBe(400);
@@ -366,26 +361,9 @@ describe("PUT /api/category/:root/rootCategory/:sub/subCategory updateSubCategor
     expect(res.body.errors).toHaveLength(2);
   });
 
-  test("update an inexisted Rootcategory from a sub-category", async () => {
-    const res = await request(app)
-      .put(
-        `/api/category/${notExistingUuid}/rootCategory/${newSubCategoryUUID}/subCategory`,
-      )
-      .set("Authorization", `Bearer ${accessToken}`)
-      .field("name", newSubCategoryName)
-      .field("description", description)
-      .field("position", 77)
-      .attach("image", imagePath);
-
-    expect(res.status).toBe(404);
-    expect(res.body).toHaveProperty("error");
-  });
-
   test("update an inexisted subCategory", async () => {
     const res = await request(app)
-      .put(
-        `/api/category/${newRootCategoryUUID}/rootCategory/${notExistingUuid}/subCategory`,
-      )
+      .put(`/api/category/${notExistingUuid}/subCategory`)
       .set("Authorization", `Bearer ${accessToken}`)
       .field("name", newSubCategoryName)
       .field("description", description)
@@ -393,14 +371,12 @@ describe("PUT /api/category/:root/rootCategory/:sub/subCategory updateSubCategor
       .attach("image", imagePath);
 
     expect(res.status).toBe(404);
-    expect(res.body).toHaveProperty("error");
+    expect(res.body.error).toBe("La categoria no existe");
   });
 
   test("update a subCategory no authorization", async () => {
     const res = await request(app)
-      .put(
-        `/api/category/${newRootCategoryUUID}/rootCategory/${newSubCategoryUUID}/subCategory`,
-      )
+      .put(`/api/category/${newSubCategoryUUID}/subCategory`)
       .field("name", newSubCategoryName)
       .field("description", description)
       .field("position", 77)

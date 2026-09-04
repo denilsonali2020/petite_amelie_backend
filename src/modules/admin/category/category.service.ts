@@ -140,14 +140,13 @@ export const categoryService = {
   },
 
   async updateSubCategory(
-    rootCategory: category["uuid"],
     subCategoryId: category["uuid"],
     data: updateSubCategory,
   ) {
     try {
-      //actualizamos la categoria donde este ese root category
+      //actualizamos la categoria
       await prisma.category.update({
-        where: { uuid: subCategoryId, parent: { uuid: rootCategory } },
+        where: { uuid: subCategoryId },
         data: {
           ...data,
           imageURL: data.imageURL,
@@ -155,10 +154,7 @@ export const categoryService = {
       });
     } catch (error: any) {
       if (error.code === "P2025") {
-        throw new HttpError(
-          "La categoría no existe o no pertenece a la categoria principal",
-          404,
-        );
+        throw new HttpError("La categoria no existe", 404);
       }
       if (error.code === "P2002") {
         throw new HttpError(
