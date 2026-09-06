@@ -97,37 +97,13 @@ export const categoryService = {
     data: updateRootCategory,
   ) {
     try {
-      //validar si existe la categoria
-      const categoryExist = await prisma.category.findUnique({
-        where: { uuid: categoryUuid },
-      });
-      if (!categoryExist) throw new HttpError("La categoria no existe", 404);
-
-      //validar si el nombre es diferente encontrado es diferente al que quiere guardar
-      if (categoryExist && categoryExist.name !== data.name) {
-        const nameExist = await prisma.category.findFirst({
-          where: {
-            name: data.name,
-            uuid: { not: categoryExist.uuid },
-            parentId: null,
-          },
-        });
-        if (nameExist)
-          throw new HttpError(
-            `Ya existe una categoría con el nombre: ${data.name}`,
-            409,
-          );
-      }
       await prisma.category.update({
         where: { uuid: categoryUuid, parentId: null },
         data,
       });
     } catch (error: any) {
       if (error.code === "P2025") {
-        throw new HttpError(
-          "La categoría no existe o no es una categoría principal",
-          404,
-        );
+        throw new HttpError("La categoria no existe", 404);
       }
       if (error instanceof Prisma.PrismaClientValidationError) {
         throw new HttpError(
@@ -153,6 +129,12 @@ export const categoryService = {
         },
       });
     } catch (error: any) {
+      if (error instanceof Prisma.PrismaClientValidationError) {
+        throw new HttpError(
+          "La información enviada contiene campos no permitidos o el formato es incorrecto.",
+          400,
+        );
+      }
       if (error.code === "P2025") {
         throw new HttpError("La categoria no existe", 404);
       }
@@ -160,12 +142,6 @@ export const categoryService = {
         throw new HttpError(
           `Ya existe una categoría con el nombre: ${data.name}`,
           409,
-        );
-      }
-      if (error instanceof Prisma.PrismaClientValidationError) {
-        throw new HttpError(
-          "La información enviada contiene campos no permitidos o el formato es incorrecto.",
-          400,
         );
       }
       throw error;

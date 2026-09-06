@@ -678,6 +678,19 @@ paths:
         "404":
           $ref: "#/components/responses/Inexisted"
 
+        "409":
+          description: Mensaje de error por nombre duplicado
+
+          content:
+            application/json:
+              schema:
+                type: object
+
+                properties:
+                  error:
+                    type: string
+                    example: Ya existe una categoría con el nombre Cremas Faciales
+
     # deleteSubCategory
     delete:
       tags:
