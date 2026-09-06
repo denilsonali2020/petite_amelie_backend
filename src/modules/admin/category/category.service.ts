@@ -188,20 +188,14 @@ export const categoryService = {
     }
   },
 
-  async deleteSubCategory(
-    rootCategory: category["uuid"],
-    subCategoryId: category["uuid"],
-  ) {
+  async deleteSubCategory(subCategoryId: category["uuid"]) {
     try {
       await prisma.category.delete({
-        where: { uuid: subCategoryId, parent: { uuid: rootCategory } },
+        where: { uuid: subCategoryId },
       });
     } catch (error: any) {
       if (error.code === "P2025") {
-        throw new HttpError(
-          "La categoría no existe o no pertenece a la categoria principal",
-          404,
-        );
+        throw new HttpError("La categoria no existe", 404);
       }
       if (error.code === "P2003") {
         throw new HttpError("La sub-categoria tiene datos asociados", 409);

@@ -104,10 +104,9 @@ router.delete(
 
 //eliminar subCategory
 router.delete(
-  "/:rootCategory/rootCategory/:subCategoryId/subCategory",
+  "/:subCategoryId/subCategory",
   authenticate,
   authorizeRoles(ROLES.OWNER),
-  param("rootCategory").isUUID().withMessage("Categoria no valida"),
   param("subCategoryId").isUUID().withMessage("Categoria no valida"),
   handleInputErrors,
   CategoryController.deleteSubCategory,

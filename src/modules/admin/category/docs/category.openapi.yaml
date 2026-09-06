@@ -475,6 +475,97 @@ paths:
         "404":
           $ref: "#/components/responses/Inexisted"
 
+    # deleteRootCategory
+    delete:
+      tags:
+        - Category
+
+      summary: Elimina una categoria raiz - deleteRootCategory
+
+      description: Elimina una categoria raiz por su UUID
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - name: categoryUuid
+          in: path
+          required: true
+          description: UUID de la categoria
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        "200":
+          description: Mensaje de exito
+
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Categoria Eliminada!
+
+        "400":
+          description: Intenta eliminar una categoria con una uuid invalido
+
+          content:
+            application/json:
+              schema:
+                type: object
+
+                properties:
+                  errors:
+                    type: array
+
+                    items:
+                      type: object
+
+                      properties:
+                        type:
+                          type: string
+                          example: field
+                        value:
+                          type: string
+                          example: uuid_ingresado
+                        msg:
+                          type: string
+                          example: Categoria no valida
+                        path:
+                          type: string
+                          example: categoryUuid
+                        location:
+                          type: string
+                          example: params
+
+                      required:
+                        - type
+                        - value
+                        - msg
+                        - path
+                        - location
+
+                required:
+                  - errors
+
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+        "404":
+          $ref: "#/components/responses/Inexisted"
+
+        "409":
+          description: Categoria con datos asociados
+          content:
+            application/json:
+              schema:
+                type: object
+
+                properties:
+                  error:
+                    type: string
+                    example: La categoria tiene datos asociados
+
   /api/category/{subCategoryId}/subCategory:
     # updateSubCategory
     put:
@@ -586,3 +677,94 @@ paths:
 
         "404":
           $ref: "#/components/responses/Inexisted"
+
+    # deleteSubCategory
+    delete:
+      tags:
+        - Category
+
+      summary: Elimina una sub-categoria
+
+      description: Elimina una subCategory por su uuid
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - name: subCategoryId
+          in: path
+          required: true
+          description: UUID de la sub-categoria
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        "200":
+          description: Mensaje de exito.
+
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Sub-Categoria eliminada!
+
+        "400":
+          description: Intenta eliminar una categoria con una uuid invalido
+
+          content:
+            application/json:
+              schema:
+                type: object
+
+                properties:
+                  errors:
+                    type: array
+
+                    items:
+                      type: object
+
+                      properties:
+                        type:
+                          type: string
+                          example: field
+                        value:
+                          type: string
+                          example: uuid_ingresado
+                        msg:
+                          type: string
+                          example: Categoria no valida
+                        path:
+                          type: string
+                          example: subCategoryId
+                        location:
+                          type: string
+                          example: params
+
+                      required:
+                        - type
+                        - value
+                        - msg
+                        - path
+                        - location
+
+                required:
+                  - errors
+
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+        "404":
+          $ref: "#/components/responses/Inexisted"
+
+        "409":
+          description: Sub-Categoria con datos asociados
+          content:
+            application/json:
+              schema:
+                type: object
+
+                properties:
+                  error:
+                    type: string
+                    example: La sub-categoria tiene datos asociados

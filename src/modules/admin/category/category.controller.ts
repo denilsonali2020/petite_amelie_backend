@@ -112,14 +112,13 @@ export class CategoryController {
 
   static deleteSubCategory = async (
     req: Request<{
-      rootCategory: Category["uuid"];
       subCategoryId: Category["uuid"];
     }>,
     res: Response,
   ) => {
     try {
-      const { rootCategory, subCategoryId } = req.params;
-      await categoryService.deleteSubCategory(rootCategory, subCategoryId);
+      const { subCategoryId } = req.params;
+      await categoryService.deleteSubCategory(subCategoryId);
       return res.status(200).send("Sub-Categoria eliminada!");
     } catch (error: any) {
       return res.status(error.status || 500).json({

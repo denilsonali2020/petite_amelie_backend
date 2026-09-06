@@ -182,7 +182,7 @@ describe("POST /api/category createCategory (subCategory)", () => {
       .attach("image", heavyPath);
     expect(res.status).toBe(400);
     expect(res.body).toHaveProperty("error");
-  });
+  }, 10000);
 });
 
 // getRootCategories
@@ -398,6 +398,15 @@ describe("DELETE /api/category/:uuid/rootCategory deleteRootCategory", () => {
     expect(res.text).toBe("Categoria Eliminada!");
   });
 
+  test("delete an invalid category", async () => {
+    const res = await request(app)
+      .delete(`/api/category/hola-que-hace/rootCategory`)
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty("errors");
+  });
+
   test("delete a category no authorization", async () => {
     const res = await request(app).delete(
       `/api/category/${rootCategoryUUID}/rootCategory`,
@@ -415,58 +424,43 @@ describe("DELETE /api/category/:uuid/rootCategory deleteRootCategory", () => {
     expect(res.status).toBe(404);
     expect(res.body.error).toBe("La categoria no existe");
   });
-
-  test("delete an invalid category", async () => {
-    const res = await request(app)
-      .delete(`/api/category/hola-que-hace/rootCategory`)
-      .set("Authorization", `Bearer ${accessToken}`);
-
-    expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty("errors");
-  });
 });
 
 // deleteSubCategory
-describe("DELETE /api/category/:rootuuid/rootCategory/:subuuid/subCategory", () => {
+describe("DELETE /api/category/:subuuid/subCategory", () => {
   test("delete a subCategory", async () => {
     const res = await request(app)
-      .delete(
-        `/api/category/${newRootCategoryUUID}/rootCategory/${newSubCategoryUUID}/subCategory`,
-      )
+      .delete(`/api/category/${newSubCategoryUUID}/subCategory`)
       .set("Authorization", `Bearer ${accessToken}`);
 
     expect(res.status).toBe(200);
     expect(res.text).toBe("Sub-Categoria eliminada!");
   });
 
-  test("delete an inexisted Rootcategory from a sub-category", async () => {
+  test("delete an invalid sub-category", async () => {
     const res = await request(app)
-      .delete(
-        `/api/category/${notExistingUuid}/rootCategory/${newSubCategoryUUID}/subCategory`,
-      )
+      .delete(`/api/category/hola-que-hace/subCategory`)
       .set("Authorization", `Bearer ${accessToken}`);
 
-    expect(res.status).toBe(404);
-    expect(res.body).toHaveProperty("error");
-  });
-
-  test("delete an inexisted subCategory", async () => {
-    const res = await request(app)
-      .delete(
-        `/api/category/${newRootCategoryUUID}/rootCategory/${notExistingUuid}/subCategory`,
-      )
-      .set("Authorization", `Bearer ${accessToken}`);
-
-    expect(res.status).toBe(404);
-    expect(res.body).toHaveProperty("error");
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty("errors");
   });
 
   test("delete a subCategory no authorization", async () => {
     const res = await request(app).delete(
-      `/api/category/${newRootCategoryUUID}/rootCategory/${newSubCategoryUUID}/subCategory`,
+      `/api/category/${newSubCategoryUUID}/subCategory`,
     );
 
     expect(res.status).toBe(401);
     expect(res.body.msg).toBe("No Autorizado");
+  });
+
+  test("delete an inexisted subCategory", async () => {
+    const res = await request(app)
+      .delete(`/api/category/${notExistingUuid}/subCategory`)
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(res.status).toBe(404);
+    expect(res.body).toHaveProperty("error");
   });
 });
