@@ -87,10 +87,11 @@ describe("POST /api/orders createOrder", () => {
     }
     orderUuid = order.uuid;
   });
-
-  test("create an order no authorization", async () => {
+  // 400
+  test("create an order with no products ", async () => {
     const res = await request(app)
       .post("/api/orders")
+      .set("Authorization", `Bearer ${accessToken}`)
       .send({
         userUUID: "55ef0a1a-91cb-4eef-9ad1-f26370f4904b",
         quickPin: "1234",
@@ -98,12 +99,6 @@ describe("POST /api/orders createOrder", () => {
         customerName: "",
         customerId: null,
         paymentMethod: "CASH",
-        items: [
-          {
-            uuid: "3f4ad9e3-384f-4605-86e5-a7934a22fd27",
-            quantity: 1,
-          },
-        ],
         shippingDetails: {
           recipientName: "",
           phone: "",
@@ -115,8 +110,10 @@ describe("POST /api/orders createOrder", () => {
         },
       });
 
-    expect(res.status).toBe(401);
-    expect(res.body.msg).toBe("No Autorizado");
+    expect(res.status).toBe(400);
+    expect(res.body.errors[0].msg).toBe(
+      "La orden debe contener al menos 1 producto",
+    );
   });
 
   test("create an order with invalid userUUID", async () => {
@@ -148,71 +145,7 @@ describe("POST /api/orders createOrder", () => {
       });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty("errors");
-  });
-
-  test("create an order with inexisted userUUID", async () => {
-    const res = await request(app)
-      .post("/api/orders")
-      .set("Authorization", `Bearer ${accessToken}`)
-      .send({
-        userUUID: notExistingUuid,
-        quickPin: "1234",
-        billingRTN: "",
-        customerName: "",
-        customerId: null,
-        paymentMethod: "CASH",
-        items: [
-          {
-            uuid: "3f4ad9e3-384f-4605-86e5-a7934a22fd27",
-            quantity: 1,
-          },
-        ],
-        shippingDetails: {
-          recipientName: "",
-          phone: "",
-          country: "",
-          department: "",
-          city: "",
-          addressLine1: "",
-          shippingCost: 0,
-        },
-      });
-
-    expect(res.status).toBe(404);
-    expect(res.body.error).toBe("El usuario no existe");
-  });
-
-  test("create an order incorrect quickPin", async () => {
-    const res = await request(app)
-      .post("/api/orders")
-      .set("Authorization", `Bearer ${accessToken}`)
-      .send({
-        userUUID: "55ef0a1a-91cb-4eef-9ad1-f26370f4904b",
-        quickPin: "1232",
-        billingRTN: "",
-        customerName: "",
-        customerId: null,
-        paymentMethod: "CASH",
-        items: [
-          {
-            uuid: "3f4ad9e3-384f-4605-86e5-a7934a22fd27",
-            quantity: 1,
-          },
-        ],
-        shippingDetails: {
-          recipientName: "",
-          phone: "",
-          country: "",
-          department: "",
-          city: "",
-          addressLine1: "",
-          shippingCost: 0,
-        },
-      });
-
-    expect(res.status).toBe(409);
-    expect(res.body.error).toBe("Pin de venta no valido");
+    expect(res.body.errors[0].msg).toBe("Usuario no valido");
   });
 
   test("create an order incorrect paymentMethod", async () => {
@@ -244,7 +177,9 @@ describe("POST /api/orders createOrder", () => {
       });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty("errors");
+    expect(res.body.errors[0].msg).toBe(
+      "Metodos de pago permitidos: CASH, TRANSFER, CARD, PAYMENT_LINK, POINTS",
+    );
   });
 
   test("create an order invalid product uuid", async () => {
@@ -276,97 +211,7 @@ describe("POST /api/orders createOrder", () => {
       });
 
     expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty("errors");
-  });
-
-  test("create an order inexisted product", async () => {
-    const res = await request(app)
-      .post("/api/orders")
-      .set("Authorization", `Bearer ${accessToken}`)
-      .send({
-        userUUID: "55ef0a1a-91cb-4eef-9ad1-f26370f4904b",
-        quickPin: "1234",
-        billingRTN: "",
-        customerName: "",
-        customerId: null,
-        paymentMethod: "CASH",
-        items: [
-          {
-            uuid: notExistingUuid,
-            quantity: 1,
-          },
-        ],
-        shippingDetails: {
-          recipientName: "",
-          phone: "",
-          country: "",
-          department: "",
-          city: "",
-          addressLine1: "",
-          shippingCost: 0,
-        },
-      });
-
-    expect(res.status).toBe(404);
-    expect(res.body.error).toBe("El producto no existe");
-  });
-
-  test("create an order with no products ", async () => {
-    const res = await request(app)
-      .post("/api/orders")
-      .set("Authorization", `Bearer ${accessToken}`)
-      .send({
-        userUUID: "55ef0a1a-91cb-4eef-9ad1-f26370f4904b",
-        quickPin: "1234",
-        billingRTN: "",
-        customerName: "",
-        customerId: null,
-        paymentMethod: "CASH",
-        shippingDetails: {
-          recipientName: "",
-          phone: "",
-          country: "",
-          department: "",
-          city: "",
-          addressLine1: "",
-          shippingCost: 0,
-        },
-      });
-
-    expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty("errors");
-  });
-
-  test("create an order validation errors for facturation", async () => {
-    const res = await request(app)
-      .post("/api/orders")
-      .set("Authorization", `Bearer ${accessToken}`)
-      .send({
-        userUUID: "",
-        quickPin: "",
-        billingRTN: "",
-        customerName: "",
-        customerId: null,
-        paymentMethod: "",
-        items: [
-          {
-            uuid: "3f4ad9e3-384f-4605-86e5-a7934a22fd27",
-            quantity: 1,
-          },
-        ],
-        shippingDetails: {
-          recipientName: "",
-          phone: "",
-          country: "",
-          department: "",
-          city: "",
-          addressLine1: "",
-          shippingCost: 0,
-        },
-      });
-
-    expect(res.status).toBe(400);
-    expect(res.body.errors).toHaveLength(3);
+    expect(res.body.errors[0].msg).toBe("ID de producto no válido");
   });
 
   test("create an order validation errors for shipment", async () => {
@@ -401,6 +246,168 @@ describe("POST /api/orders createOrder", () => {
     expect(res.body).toHaveProperty("errors");
     expect(res.body.errors).toHaveLength(5);
   });
+
+  test("create an order validation errors for quickPin", async () => {
+    const res = await request(app)
+      .post("/api/orders")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({
+        userUUID: "55ef0a1a-91cb-4eef-9ad1-f26370f4904b",
+        quickPin: "",
+        billingRTN: "",
+        customerName: "",
+        customerId: null,
+        paymentMethod: "CASH",
+        items: [
+          {
+            uuid: "3f4ad9e3-384f-4605-86e5-a7934a22fd27",
+            quantity: 1,
+          },
+        ],
+        shippingDetails: {
+          recipientName: "",
+          phone: "",
+          country: "",
+          department: "",
+          city: "",
+          addressLine1: "",
+          shippingCost: 0,
+        },
+      });
+
+    expect(res.status).toBe(400);
+    expect(res.body.errors[0].msg).toBe("El pin debe ser de 4 digitos");
+  });
+
+  // 401
+  test("create an order no authorization", async () => {
+    const res = await request(app)
+      .post("/api/orders")
+      .send({
+        userUUID: "55ef0a1a-91cb-4eef-9ad1-f26370f4904b",
+        quickPin: "1234",
+        billingRTN: "",
+        customerName: "",
+        customerId: null,
+        paymentMethod: "CASH",
+        items: [
+          {
+            uuid: "3f4ad9e3-384f-4605-86e5-a7934a22fd27",
+            quantity: 1,
+          },
+        ],
+        shippingDetails: {
+          recipientName: "",
+          phone: "",
+          country: "",
+          department: "",
+          city: "",
+          addressLine1: "",
+          shippingCost: 0,
+        },
+      });
+
+    expect(res.status).toBe(401);
+    expect(res.body.msg).toBe("No Autorizado");
+  });
+
+  // 404
+  test("create an order with inexisted userUUID", async () => {
+    const res = await request(app)
+      .post("/api/orders")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({
+        userUUID: notExistingUuid,
+        quickPin: "1234",
+        billingRTN: "",
+        customerName: "",
+        customerId: null,
+        paymentMethod: "CASH",
+        items: [
+          {
+            uuid: "3f4ad9e3-384f-4605-86e5-a7934a22fd27",
+            quantity: 1,
+          },
+        ],
+        shippingDetails: {
+          recipientName: "",
+          phone: "",
+          country: "",
+          department: "",
+          city: "",
+          addressLine1: "",
+          shippingCost: 0,
+        },
+      });
+
+    expect(res.status).toBe(404);
+    expect(res.body.error).toBe("El usuario no existe");
+  });
+
+  test("create an order inexisted product", async () => {
+    const res = await request(app)
+      .post("/api/orders")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({
+        userUUID: "55ef0a1a-91cb-4eef-9ad1-f26370f4904b",
+        quickPin: "1234",
+        billingRTN: "",
+        customerName: "",
+        customerId: null,
+        paymentMethod: "CASH",
+        items: [
+          {
+            uuid: notExistingUuid,
+            quantity: 1,
+          },
+        ],
+        shippingDetails: {
+          recipientName: "",
+          phone: "",
+          country: "",
+          department: "",
+          city: "",
+          addressLine1: "",
+          shippingCost: 0,
+        },
+      });
+
+    expect(res.status).toBe(404);
+    expect(res.body.error).toBe("El producto no existe");
+  });
+
+  // 409
+  test("create an order incorrect quickPin", async () => {
+    const res = await request(app)
+      .post("/api/orders")
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({
+        userUUID: "55ef0a1a-91cb-4eef-9ad1-f26370f4904b",
+        quickPin: "1232",
+        billingRTN: "",
+        customerName: "",
+        customerId: null,
+        paymentMethod: "CASH",
+        items: [
+          {
+            uuid: "3f4ad9e3-384f-4605-86e5-a7934a22fd27",
+            quantity: 1,
+          },
+        ],
+        shippingDetails: {
+          recipientName: "",
+          phone: "",
+          country: "",
+          department: "",
+          city: "",
+          addressLine1: "",
+          shippingCost: 0,
+        },
+      });
+
+    expect(res.status).toBe(409);
+    expect(res.body.error).toBe("Pin de venta no valido");
+  });
 });
 
 // getOrders
@@ -427,16 +434,6 @@ describe("GET /api/orders getOrders", () => {
     });
   });
 
-  test("get all the orders no authorization ", async () => {
-    const res = await request(app).get("/api/orders").query({
-      page: 2,
-      limit: 10,
-    });
-
-    expect(res.status).toBe(401);
-    expect(res.body.msg).toBe("No Autorizado");
-  });
-
   test("get all the orders invalid query params", async () => {
     const res = await request(app)
       .get("/api/orders")
@@ -450,6 +447,16 @@ describe("GET /api/orders getOrders", () => {
     expect(res.body).toHaveProperty("errors");
     expect(res.body.errors).toHaveLength(2);
   });
+
+  test("get all the orders no authorization ", async () => {
+    const res = await request(app).get("/api/orders").query({
+      page: 2,
+      limit: 10,
+    });
+
+    expect(res.status).toBe(401);
+    expect(res.body.msg).toBe("No Autorizado");
+  });
 });
 
 // getOrder
@@ -462,6 +469,16 @@ describe("GET /api/orders/:uuid getOrder", () => {
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty("invoiceNumber");
     expect(res.headers["content-type"]).toMatch(/json/);
+  });
+
+  test("get an order invalid order", async () => {
+    const res = await request(app)
+      .get(`/api/orders/hola-que-hace`)
+      .set("Authorization", `Bearer ${accessToken}`);
+
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty("errors");
+    expect(res.body.errors).toHaveLength(1);
   });
 
   test("get an order no authorization", async () => {
@@ -478,16 +495,6 @@ describe("GET /api/orders/:uuid getOrder", () => {
 
     expect(res.status).toBe(404);
     expect(res.body.error).toBe("El pedido no existe");
-  });
-
-  test("get an order invalid order", async () => {
-    const res = await request(app)
-      .get(`/api/orders/hola-que-hace`)
-      .set("Authorization", `Bearer ${accessToken}`);
-
-    expect(res.status).toBe(400);
-    expect(res.body).toHaveProperty("errors");
-    expect(res.body.errors).toHaveLength(1);
   });
 });
 

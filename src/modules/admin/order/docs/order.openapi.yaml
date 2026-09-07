@@ -1,0 +1,641 @@
+# CONTROL DE VERSIONES
+info:
+  title: DOC for Order
+  version: 1.0.1
+openapi: 3.1.0
+components:
+  responses:
+    # Peticion sin estar autenticado
+    Unauthorized:
+      description: Usuario no autenticado
+      content:
+        application/json:
+          schema:
+            type: object
+
+            properties:
+              msg:
+                type: string
+                example: No Autorizado
+
+    # Peticion cuando no encuentra una orden en la DB
+    Inexisted:
+      description: Orden no encontrada
+      content:
+        application/json:
+          schema:
+            type: object
+
+            properties:
+              error:
+                type: string
+                example: La orden no existe
+
+# RUTAS DE ORDENES
+paths:
+  /api/orders:
+    # createOrder
+    post:
+      tags:
+        - Orders
+
+      summary: Crea una nueva venta desde POS - createOrder
+
+      description: Crea una nueva venta desde el punto de venta por atendido por un usuario
+
+      security:
+        - bearerAuth: []
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+
+              properties:
+                userUUID:
+                  type: string
+                  format: uuid
+
+                quickPin:
+                  type: string
+                  maximum: 4
+                  minimum: 4
+
+                billingRTN:
+                  type: string
+                  maximum: 13
+                  minimum: 13
+
+                customerName:
+                  type: string
+
+                customerId:
+                  type: string
+                  format: uuid
+
+                paymentMethod:
+                  type: string
+                  enum:
+                    - CASH
+                    - TRANSFER
+                    - CARD
+                    - PAYMENT_LINK
+                    - POINTS
+
+                items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      uuid:
+                        type: string
+                        format: uuid
+
+                      quantity:
+                        type: number
+                        minimum: 1
+
+                shippingDetails:
+                  type: object
+                  properties:
+                    recipientName:
+                      type: string
+
+                    phone:
+                      type: string
+
+                    country:
+                      type: string
+
+                    department:
+                      type: string
+
+                    city:
+                      type: string
+
+                    addressLine1:
+                      type: string
+
+                    shippingCost:
+                      type: number
+
+              required:
+                - userUUID
+                - quickPin
+                - paymentMethod
+                - items
+
+      responses:
+        "201":
+          description: Devuelve la informacion para la facturacion de la venta
+
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                    example: 123
+
+                  invoiceNumber:
+                    type: string
+                    example: 000-001-01-00000238
+
+                  cai:
+                    type: string
+                    example: 55R1F4-978G76-A87690-32L1F7-87J0K7-76
+
+                  channel:
+                    type: string
+                    example: POS
+
+                  billingRTN:
+                    type: string
+                    examples:
+                      - S/N
+                      - 04012002013245
+
+                  customerName:
+                    type: string
+                    examples:
+                      - CONSUMIDOR FINAL
+                      - Nombre_ingresado
+
+                  deliveryType:
+                    type: string
+                    examples:
+                      - IN_STORE_PICKUP
+                      - SHIPPING
+
+                  shippingCost:
+                    type: string
+                    example: 0.00
+
+                  total:
+                    type: string
+                    example: 400.12
+
+                  status:
+                    type: string
+                    examples:
+                      - DELIVERED
+                      - PREPARING
+
+                  pointsEarned:
+                    type: number
+                    example: 200
+
+                  discountAmount:
+                    type: string
+                    example: 50.12
+
+                  createdAt:
+                    type: string
+                    example: 2026-09-07T16:02:24.389Z
+
+                  rangeFrom:
+                    type: string
+                    example: 000-001-01-00000001
+
+                  rangeTo:
+                    type: string
+                    example: 000-001-01-00005000
+
+                  limitDate:
+                    type: string
+                    example: 2028-12-31T23:59:59.000Z
+
+                  importeExonerado:
+                    type: string
+                    example: 0.00
+
+                  importeExento:
+                    type: string
+                    example: 0.00
+
+                  importeGravado15:
+                    type: string
+                    example: 347.12
+
+                  isv15:
+                    type: string
+                    example: 30.12
+
+                  importeGravado18:
+                    type: string
+                    example: 0.00
+
+                  isv18:
+                    type: string
+                    example: 0.00
+
+                  totalItems:
+                    type: number
+                    example: 1
+
+                  paymentMethod:
+                    type: string
+                    enum:
+                      - CASH
+                      - TRANSFER
+                      - CARD
+                      - PAYMENT_LINK
+                      - POINTS
+
+                  seller:
+                    type: string
+                    example: Denilson Trochez
+
+                  processedItemsBill:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          example: Crema Facial
+
+                        sku:
+                          type: string
+                          example: 372193
+
+                        quantity:
+                          type: number
+                          example: 1
+
+                        discount:
+                          type: string
+                          example: 50.12
+
+                        realPrice:
+                          type: string
+                          example: 450.11
+
+                        subTotal:
+                          type: string
+                          example: 400.11
+
+                  petiteAmelieRTN:
+                    type: string
+                    example: 04012002013245
+
+        "400":
+          description: Errores de validacion
+
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+
+                        value:
+                          type: string
+
+                        msg:
+                          type: string
+                          example: mensaje_de_error
+
+                        path:
+                          type: string
+
+                        location:
+                          type: string
+
+                      required:
+                        - type
+                        - msg
+                        - path
+                        - location
+
+                required:
+                  - errors
+
+              examples:
+                itemsProducts:
+                  summary: Enviar peticion sin el campo de items con sus productos
+                  value:
+                    errors:
+                      - type: field
+                        msg: La orden debe contener al menos 1 producto
+                        path: items
+                        location: body
+
+                invalidUser:
+                  summary: uuid invalido de vendedor
+                  value:
+                    errors:
+                      - type: field
+                        value: uuid_ingresado
+                        msg: Usuario no valido
+                        path: userUUID
+                        location: body
+
+                invalidPaymentMethod:
+                  summary: Metodo de pago no valido
+                  value:
+                    errors:
+                      - type: field
+                        value: metodo_ingresado
+                        msg: Metodos de pago permitidos CASH, TRANSFER, CARD, PAYMENT_LINK, POINTS
+                        path: usepaymentMethodrUUID
+                        location: body
+
+                invalidProductUuid:
+                  summary: Uuid invalido de un producto
+                  value:
+                    errors:
+                      - type: field
+                        value: uuid_ingresado
+                        msg: ID de producto no válido
+                        path: items[0].uuid
+                        location: body
+
+                shipmentErrors:
+                  summary: Informacion faltante para realizar envio
+                  value:
+                    errors:
+                      - type: field
+                        value: ""
+                        msg: El teléfono es obligatorio para envíos
+                        path: shippingDetails.phone
+                        location: body
+
+                      - type: field
+                        value: ""
+                        msg: El país es obligatorio para envíos
+                        path: shippingDetails.country
+                        location: body
+
+                      - type: field
+                        value: ""
+                        msg: El departamento/estado es obligatorio para envíos
+                        path: shippingDetails.department
+                        location: body
+
+                      - type: field
+                        value: ""
+                        msg: La ciudad es obligatoria para envíos
+                        path: shippingDetails.city
+                        location: body
+
+                      - type: field
+                        value: ""
+                        msg: La dirección exacta es obligatoria para envíos
+                        path: shippingDetails.addressLine1
+                        location: body
+
+                invalidQuickPin:
+                  summary: Ingresar pin de venta invalido
+                  value:
+                    errors:
+                      - type: field
+                        value: pin_ingresado
+                        msg: El pin debe ser de 4 digitos
+                        path: quickPin
+                        location: body
+
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+        "404":
+          description: Errores por recursos no encontrados
+
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+
+                required:
+                  - msg
+
+              examples:
+                inexisterdUSER:
+                  summary: Usuario no existente
+                  value:
+                    msg: El usuario no existe
+
+                inexistedProduct:
+                  summary: Producto no existente
+                  value:
+                    msg: El producto no existe
+
+        "409":
+          description: Pin de venta incorrecto
+
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: Pin de venta no valido
+
+    # getOrders
+    get:
+      tags:
+        - Orders
+      summary: Obtener las ordenes con paginacion - getOrders
+
+      description: Obtiene todas las ordenes disponibles mediante paginacion
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: number
+            minimum: 1
+
+        - in: query
+          name: limit
+          schema:
+            type: number
+            minimum: 10
+            maximum: 100
+
+      responses:
+        "200":
+          description: Obtiene las ventas mediante paginacion
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        uuid:
+                          type: string
+                          format: uuid
+
+                        invoiceNumber:
+                          type: string
+                          example: 000-001-01-00000247
+
+                        cai:
+                          type: string
+                          example: 55R1F4-978G76-A87690-32L1F7-87J0K7-76
+
+                        channel:
+                          type: string
+                          enum:
+                            - POS
+                            - WEB
+
+                        billingRTN:
+                          type: string
+                          examples:
+                            - S/N
+                            - 04012002013245
+
+                        customerName:
+                          type: string
+                          example: CONSUMIDOR FINAL
+
+                        total:
+                          type: string
+                          example: 520.00
+
+                        status:
+                          type: string
+                          enum:
+                            - PENDING
+                            - PAID
+                            - PREPARING
+                            - READY
+                            - SHIPPED
+                            - DELIVERED
+                            - CANCELLED
+                            - REFUNDED
+
+                        deliveryType:
+                          type: string
+                          enum:
+                            - IN_STORE_PICKUP
+                            - SHIPPING
+
+                        pointsEarned:
+                          type: number
+                          example: 170.00
+
+                        pointsUsed:
+                          type: number
+                          example: 120.00
+
+                        discountAmount:
+                          type: string
+                          example: 30.12
+
+                        user:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              example: Denilson Trochez
+
+                        createdAt:
+                          type: string
+                          example: 2026-09-07T16:30:44.179Z
+
+                  meta:
+                    type: object
+                    properties:
+                      totalOrders:
+                        type: number
+                        example: 257
+
+                      totalPages:
+                        type: number
+                        example: 26
+
+                      currentPage:
+                        type: number
+                        example: 2
+
+                      limit:
+                        type: number
+                        example: 10
+
+                      hasNextPage:
+                        type: boolean
+
+                      hasPreviousPage:
+                        type: boolean
+                required:
+                  - data
+                  - meta
+
+        "400":
+          description: Muestra error por query params no validos
+
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+
+                        value:
+                          type: string
+
+                        msg:
+                          type: string
+
+                        path:
+                          type: string
+
+                        location:
+                          type: string
+
+                      required:
+                        - type
+                        - value
+                        - msg
+                        - path
+                        - location
+
+                required:
+                  - errors
+
+              examples:
+                itemsProducts:
+                  summary: Enviar query params no validos
+                  value:
+                    errors:
+                      - type: field
+                        value: -2
+                        msg: La página debe ser un número entero mayor a 0
+                        path: page
+                        location: query
+
+                      - type: field
+                        value: -10
+                        msg: El límite debe ser un número entre 1 y 100
+                        path: limit
+                        location: query
+
+        "401":
+          $ref: "#/components/responses/Unauthorized"
