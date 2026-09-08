@@ -159,13 +159,11 @@ paths:
 
                   customerName:
                     type: string
-                    examples:
-                      - CONSUMIDOR FINAL
-                      - Nombre_ingresado
+                    example: CONSUMIDOR FINAL
 
                   deliveryType:
                     type: string
-                    examples:
+                    enum:
                       - IN_STORE_PICKUP
                       - SHIPPING
 
@@ -179,7 +177,7 @@ paths:
 
                   status:
                     type: string
-                    examples:
+                    enum:
                       - DELIVERED
                       - PREPARING
 
@@ -502,8 +500,8 @@ paths:
                         billingRTN:
                           type: string
                           examples:
-                            - S/N
                             - 04012002013245
+                            - S/N
 
                         customerName:
                           type: string
@@ -690,7 +688,7 @@ paths:
 
                   customerName:
                     type: string
-                    example:
+                    examples:
                       - CONSUMIDOR FINAL
                       - Maria Hernestina
 
