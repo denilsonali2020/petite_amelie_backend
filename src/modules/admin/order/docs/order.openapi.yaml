@@ -2,7 +2,7 @@
 info:
   title: DOC for Order
   version: 1.0.1
-openapi: 3.1.0
+openapi: 3.2.0
 components:
   responses:
     # Peticion sin estar autenticado
@@ -19,7 +19,7 @@ components:
                 example: No Autorizado
 
     # Peticion cuando no encuentra una orden en la DB
-    Inexisted:
+    InexistedOrder:
       description: Orden no encontrada
       content:
         application/json:
@@ -29,7 +29,7 @@ components:
             properties:
               error:
                 type: string
-                example: La orden no existe
+                example: El pedido no existe
 
 # RUTAS DE ORDENES
 paths:
@@ -639,3 +639,218 @@ paths:
 
         "401":
           $ref: "#/components/responses/Unauthorized"
+
+  /api/orders/{uuid}:
+    # getOrder
+    get:
+      tags:
+        - Orders
+
+      summary: Obtiene la informacion de una venta - getOrder
+
+      description: Obtiene la informacion completa de una venta e informacion de envio si se creo con ella
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+
+      responses:
+        "200":
+          description: Obtiene la informacion de la venta completa
+
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invoiceNumber:
+                    type: string
+                    example: 000-001-01-00000005
+
+                  cai:
+                    type: string
+                    example: 55R1F4-978G76-A87690-32L1F7-87J0K7-76
+
+                  channel:
+                    type: string
+                    enum:
+                      - POS
+                      - WEB
+
+                  billingRTN:
+                    type: string
+                    example: 04012002013245
+
+                  customerName:
+                    type: string
+                    example:
+                      - CONSUMIDOR FINAL
+                      - Maria Hernestina
+
+                  total:
+                    type: string
+                    example: 1210.00
+
+                  status:
+                    type: string
+                    enum:
+                      - PENDING
+                      - PAID
+                      - PREPARING
+                      - READY
+                      - SHIPPED
+                      - DELIVERED
+                      - CANCELLED
+                      - REFUNDED
+
+                  deliveryType:
+                    type: string
+                    enum:
+                      - IN_STORE_PICKUP
+                      - SHIPPING
+
+                  shippingCost:
+                    type: string
+                    example: 0.00
+
+                  pointsEarned:
+                    type: number
+                    example: 404
+
+                  createdAt:
+                    type: string
+                    example: 2026-04-27T19:34:51.660Z
+
+                  user:
+                    type: string
+                    example: Denilson Trochez
+
+                  payment:
+                    type: string
+                    enum:
+                      - CASH
+                      - TRANSFER
+                      - CARD
+                      - PAYMENT_LINK
+                      - POINTS
+
+                  shippingDetails:
+                    type: [object, "null"]
+
+                    properties:
+                      recipientName:
+                        type: string
+                        example: Elaira Samantha
+
+                      phone:
+                        type: string
+                        example: 9777-8132
+
+                      country:
+                        type: string
+                        example: HON
+
+                      department:
+                        type: string
+                        example: Copan
+
+                      city:
+                        type: string
+                        example: SRC
+
+                      addressLine1:
+                        type: string
+                        example: Col. Mejia garcia
+
+                      trackingNumber:
+                        type: [string, "null"]
+                        example: 1234-1234-12434
+
+                      shippingCompany:
+                        type: [string, "null"]
+                        example: Pronto Cargo
+
+                  orderItems:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        sku:
+                          type: string
+                          example: 3213712
+
+                        name:
+                          type: string
+                          example: Crema Nutridem
+
+                        quantity:
+                          type: number
+                          example: 2
+
+                        discount:
+                          type: string
+                          example: 20
+
+                        originalPrice:
+                          type: string
+                          example: 150
+
+                        price:
+                          type: string
+                          example: 130
+
+        "400":
+          description: Muestra error por uuid invalido
+
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          example: field
+
+                        value:
+                          type: string
+                          example: uuid_ingresado
+
+                        msg:
+                          type: string
+                          example: Orden no válida
+
+                        path:
+                          type: string
+                          example: uuid
+
+                        location:
+                          type: string
+                          example: params
+
+                      required:
+                        - type
+                        - value
+                        - msg
+                        - path
+                        - location
+
+                required:
+                  - errors
+
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+        "404":
+          $ref: "#/components/responses/InexistedOrder"

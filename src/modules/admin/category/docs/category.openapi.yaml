@@ -2,7 +2,7 @@
 info:
   title: DOC for Category
   version: 1.0.1
-openapi: 3.1.0
+openapi: 3.2.0
 components:
   responses:
     # Peticion sin estar autenticado
@@ -19,7 +19,7 @@ components:
                 example: No Autorizado
 
     # Peticion cuando no encuentra una categoria en la DB
-    Inexisted:
+    InexistedCategory:
       description: Categoria no encontrada
       content:
         application/json:
@@ -264,7 +264,7 @@ paths:
           $ref: "#/components/responses/Unauthorized"
 
         "404":
-          $ref: "#/components/responses/Inexisted"
+          $ref: "#/components/responses/InexistedCategory"
 
   /api/category/{categoryUuid}/category:
     # getCategory
@@ -360,7 +360,7 @@ paths:
           $ref: "#/components/responses/Unauthorized"
 
         "404":
-          $ref: "#/components/responses/Inexisted"
+          $ref: "#/components/responses/InexistedCategory"
 
   /api/category/{categoryUuid}/rootCategory:
     # updateRootCategory
@@ -473,7 +473,7 @@ paths:
           $ref: "#/components/responses/Unauthorized"
 
         "404":
-          $ref: "#/components/responses/Inexisted"
+          $ref: "#/components/responses/InexistedCategory"
 
     # deleteRootCategory
     delete:
@@ -552,7 +552,7 @@ paths:
           $ref: "#/components/responses/Unauthorized"
 
         "404":
-          $ref: "#/components/responses/Inexisted"
+          $ref: "#/components/responses/InexistedCategory"
 
         "409":
           description: Categoria con datos asociados
@@ -676,7 +676,7 @@ paths:
           $ref: "#/components/responses/Unauthorized"
 
         "404":
-          $ref: "#/components/responses/Inexisted"
+          $ref: "#/components/responses/InexistedCategory"
 
         "409":
           description: Mensaje de error por nombre duplicado
@@ -768,7 +768,7 @@ paths:
           $ref: "#/components/responses/Unauthorized"
 
         "404":
-          $ref: "#/components/responses/Inexisted"
+          $ref: "#/components/responses/InexistedCategory"
 
         "409":
           description: Sub-Categoria con datos asociados

@@ -383,7 +383,19 @@ export const orderService = {
       },
     });
     if (!order) throw new HttpError("El pedido no existe", 404);
-    return order;
+    return {
+      ...order,
+      user: order.user?.name ?? "S/N",
+      payment: order.payment!.method,
+      orderItems: order.orderItems.map((item) => ({
+        sku: item.product.sku,
+        name: item.product.name,
+        quantity: item.quantity,
+        discount: item.discount,
+        originalPrice: item.originalPrice,
+        price: item.price,
+      })),
+    };
   },
 
   async addShippingInfo(uuid: order["uuid"], data: addShippingInfo) {
