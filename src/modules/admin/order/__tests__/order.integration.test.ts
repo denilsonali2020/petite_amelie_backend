@@ -494,7 +494,7 @@ describe("GET /api/orders/:uuid getOrder", () => {
       .set("Authorization", `Bearer ${accessToken}`);
 
     expect(res.status).toBe(404);
-    expect(res.body.error).toBe("El pedido no existe");
+    expect(res.body.error).toBe("La orden no existe");
   });
 });
 
@@ -513,18 +513,6 @@ describe("POST /api/orders/:uuid/shipping addShippingInfo", () => {
     expect(res.text).toBe("Informacion agregada!");
   });
 
-  test("add shipping info to an order no authorization", async () => {
-    const res = await request(app)
-      .post(`/api/orders/${orderUuid}/shipping`)
-      .send({
-        shippingCompany: "Expreco",
-        trackingNumber: "33461387264812364",
-      });
-
-    expect(res.status).toBe(401);
-    expect(res.body.msg).toBe("No Autorizado");
-  });
-
   test("add shipping info to an order invalid uuid", async () => {
     const res = await request(app)
       .post(`/api/orders/hola-que-hace/shipping`)
@@ -537,6 +525,18 @@ describe("POST /api/orders/:uuid/shipping addShippingInfo", () => {
     expect(res.status).toBe(400);
     expect(res.body.errors).toHaveLength(1);
     expect(res.body).toHaveProperty("errors");
+  });
+
+  test("add shipping info to an order no authorization", async () => {
+    const res = await request(app)
+      .post(`/api/orders/${orderUuid}/shipping`)
+      .send({
+        shippingCompany: "Expreco",
+        trackingNumber: "33461387264812364",
+      });
+
+    expect(res.status).toBe(401);
+    expect(res.body.msg).toBe("No Autorizado");
   });
 
   test("add shipping info to an order inexisted order", async () => {
@@ -569,17 +569,6 @@ describe("PATCH /api/orders/:uuid/status changeStatus", () => {
     expect(res.text).toBe("Estado cambiado!");
   });
 
-  test("change status from an order no authorization", async () => {
-    const res = await request(app)
-      .patch(`/api/orders/${orderUuid}/status`)
-      .send({
-        status: "PAID",
-      });
-
-    expect(res.status).toBe(401);
-    expect(res.body.msg).toBe("No Autorizado");
-  });
-
   test("change status from an invalid order", async () => {
     const res = await request(app)
       .patch(`/api/orders/hola-que-hace/status`)
@@ -591,18 +580,6 @@ describe("PATCH /api/orders/:uuid/status changeStatus", () => {
     expect(res.status).toBe(400);
     expect(res.body.errors).toHaveLength(1);
     expect(res.body).toHaveProperty("errors");
-  });
-
-  test("change status from an inexisted order ", async () => {
-    const res = await request(app)
-      .patch(`/api/orders/${notExistingUuid}/status`)
-      .set("Authorization", `Bearer ${accessToken}`)
-      .send({
-        status: "PAID",
-      });
-
-    expect(res.status).toBe(404);
-    expect(res.body.error).toBe("La orden no existe");
   });
 
   test("change status from an order invalid status ENUM", async () => {
@@ -619,5 +596,28 @@ describe("PATCH /api/orders/:uuid/status changeStatus", () => {
     expect(res.body.errors[0].msg).toBe(
       "El estado debe ser: PENDING, PAID, PREPARING, READY, SHIPPED, DELIVERED, CANCELLED, REFUNDED",
     );
+  });
+
+  test("change status from an order no authorization", async () => {
+    const res = await request(app)
+      .patch(`/api/orders/${orderUuid}/status`)
+      .send({
+        status: "PAID",
+      });
+
+    expect(res.status).toBe(401);
+    expect(res.body.msg).toBe("No Autorizado");
+  });
+
+  test("change status from an inexisted order ", async () => {
+    const res = await request(app)
+      .patch(`/api/orders/${notExistingUuid}/status`)
+      .set("Authorization", `Bearer ${accessToken}`)
+      .send({
+        status: "PAID",
+      });
+
+    expect(res.status).toBe(404);
+    expect(res.body.error).toBe("La orden no existe");
   });
 });

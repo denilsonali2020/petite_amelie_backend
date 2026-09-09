@@ -29,7 +29,7 @@ components:
             properties:
               error:
                 type: string
-                example: El pedido no existe
+                example: La orden no existe
 
 # RUTAS DE ORDENES
 paths:
@@ -846,6 +846,222 @@ paths:
 
                 required:
                   - errors
+
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+        "404":
+          $ref: "#/components/responses/InexistedOrder"
+
+  /api/orders/{uuid}/shipping:
+    # addShippingInfo
+    post:
+      tags:
+        - Orders
+
+      summary: Agrega la informacion de envio a una venta - addShippingInfo
+
+      description: Agrega la informacion de comañia y tracking de envio a una venta
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                shippingCompany:
+                  type: string
+                  example: Expreco
+
+                trackingNumber:
+                  type: string
+                  example: 3123-6138-2648-2364
+
+              required:
+                - shippingCompany
+                - trackingNumber
+
+      responses:
+        "200":
+          description: Retorna un mensaje de exito
+
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Informacion agregada!
+
+        "400":
+          description: Muestra error por uuid invalido de una venta
+
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          example: field
+
+                        value:
+                          type: string
+                          value: uuid_ingresado
+
+                        msg:
+                          type: string
+                          example: Orden no válida
+
+                        path:
+                          type: string
+                          example: uuid
+
+                        location:
+                          type: string
+                          example: params
+
+                      required:
+                        - type
+                        - value
+                        - msg
+                        - path
+                        - location
+
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+        "404":
+          description: Venta no encontrada
+
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: La orden no existe o no requiere informacion de envio
+
+  /api/orders/{uuid}/status:
+    # changeStatus
+    patch:
+      tags:
+        - Orders
+
+      summary: Actualiza el estado de una venta - changeStatus
+
+      description: Actualiza el estado de una venta que sea con envio o sin.
+
+      security:
+        - bearerAuth: []
+
+      parameters:
+        - in: path
+          name: uuid
+          required: true
+          schema:
+            type: string
+            format: uuid
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum:
+                    - PENDING
+                    - PAID
+                    - PREPARING
+                    - READY
+                    - SHIPPED
+                    - DELIVERED
+                    - CANCELLED
+                    - REFUNDED
+
+      responses:
+        "200":
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Estado cambiado!
+
+        "400":
+          description: Mensajes de error por uuid invalido y status invalido
+
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+
+                        value:
+                          type: string
+
+                        msg:
+                          type: string
+
+                        path:
+                          type: string
+
+                        location:
+                          type: string
+
+                      required:
+                        - type
+                        - value
+                        - msg
+                        - path
+                        - location
+
+                required:
+                  - errors
+
+              examples:
+                invalidUUID:
+                  summary: Ingreso de uuid invalido de una venta
+                  value:
+                    errors:
+                      - type: field
+                        value: uuid_ingresado
+                        msg: Orden no válida
+                        path: uuid
+                        location: params
+
+                invalidStatus:
+                  summary: Status no valido
+                  value:
+                    errors:
+                      - type: field
+                        value: status_ingresado
+                        msg: El estado debe ser PENDING, PAID, PREPARING, READY, SHIPPED, DELIVERED, CANCELLED, REFUNDED
+                        path: status
+                        location: body
 
         "401":
           $ref: "#/components/responses/Unauthorized"

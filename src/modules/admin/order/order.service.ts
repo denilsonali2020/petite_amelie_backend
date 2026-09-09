@@ -382,7 +382,7 @@ export const orderService = {
         },
       },
     });
-    if (!order) throw new HttpError("El pedido no existe", 404);
+    if (!order) throw new HttpError("La orden no existe", 404);
     return {
       ...order,
       user: order.user?.name ?? "S/N",
