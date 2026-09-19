@@ -9,12 +9,3 @@ export const ROOMS = {
   KITCHEN: "kitchen",
   CASHIER: "cashier",
 };
-
-//
-//
-//
-//
-//
-//
-//
-//
