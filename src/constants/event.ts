@@ -9,3 +9,5 @@ export const ROOMS = {
   KITCHEN: "kitchen",
   CASHIER: "cashier",
 };
+
+// Comentario de prueba con un nuevo branch
