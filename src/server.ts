@@ -21,6 +21,7 @@ import storeCategoryRoutes from "./modules/public/storeCategory/storeCategory.ro
 // import authRoutes from "../src/modules/auth/auth.routes.js"; //rutas de cliente pendiente
 import { corsConfig } from "./config/cors.js";
 import { multerErrorHandler } from "./middleware/validation.js";
+import { publicLimiter } from "./config/express-rate-limit.js";
 
 //Instancia de express
 const app = express();
@@ -30,6 +31,20 @@ app.use(cors(corsConfig));
 
 //Poder enviar json como respuesta
 app.use(express.json());
+
+// Docs swagger
+app.use(
+  "/docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    swaggerOptions: {
+      persistAuthorization: true,
+    },
+  }),
+);
+
+//Limitador de peticiones
+app.use(publicLimiter);
 
 //Poder enviar cookies
 app.use(cookieParser());
@@ -54,16 +69,5 @@ app.use("/api/store/category", storeCategoryRoutes);
 
 // Errores de multer
 app.use(multerErrorHandler);
-
-// Docs swagger
-app.use(
-  "/docs",
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerSpec, {
-    swaggerOptions: {
-      persistAuthorization: true,
-    },
-  }),
-);
 
 export default app;
