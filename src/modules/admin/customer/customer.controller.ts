@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { customerService } from "./customer.service.js";
+import { responseError } from "../../../shared/errors/ResponseError.js";
 
 export class CustomerController {
   static getCustomerBilingInfo = async (
@@ -10,10 +11,8 @@ export class CustomerController {
       const { identifier } = req.params;
       const customer = await customerService.getCustomerBilingInfo(identifier);
       return res.status(200).json(customer);
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 }

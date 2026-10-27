@@ -1,15 +1,14 @@
 import type { Request, Response } from "express";
 import { dashboardService } from "./dashboard.service.js";
+import { responseError } from "../../../shared/errors/ResponseError.js";
 
 export class DashboardController {
   static getCurrentYearMonthlySales = async (req: Request, res: Response) => {
     try {
       const sales = await dashboardService.getCurrentYearMonthlySales();
       return res.status(200).json(sales);
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -17,10 +16,8 @@ export class DashboardController {
     try {
       const recentOrders = await dashboardService.getRecentOrders();
       return res.status(200).json(recentOrders);
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -28,10 +25,8 @@ export class DashboardController {
     try {
       const topCategories = await dashboardService.getTopSellingSubcategories();
       return res.status(200).json(topCategories);
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -39,10 +34,8 @@ export class DashboardController {
     try {
       const topProducts = await dashboardService.getTopSellingProducts();
       return res.status(200).json(topProducts);
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 }

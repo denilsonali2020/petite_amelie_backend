@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 
 import { categoryService } from "./category.service.js";
 import { Category } from "../../../generated/prisma/client.js";
+import { responseError } from "../../../shared/errors/ResponseError.js";
 
 export class CategoryController {
   static createCategory = async (req: Request, res: Response) => {
@@ -9,10 +10,8 @@ export class CategoryController {
       const imageURL = req.file?.path || null;
       await categoryService.createCategory({ ...req.body, imageURL });
       return res.status(201).send("Categoria creada!");
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -20,10 +19,8 @@ export class CategoryController {
     try {
       const categories = await categoryService.getRootCategories();
       return res.status(200).json(categories);
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -35,10 +32,8 @@ export class CategoryController {
       const { uuid } = req.params;
       const subCategories = await categoryService.getSubCategoriesByUuid(uuid);
       return res.status(200).json(subCategories);
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -50,10 +45,8 @@ export class CategoryController {
       const { categoryUuid } = req.params;
       const category = await categoryService.getCategory(categoryUuid);
       return res.status(200).json(category);
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -65,10 +58,8 @@ export class CategoryController {
       const { categoryUuid } = req.params;
       await categoryService.updateRootCategory(categoryUuid, req.body);
       return res.status(200).send("Categoria actualizada!");
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -86,10 +77,8 @@ export class CategoryController {
         imageURL,
       });
       return res.status(200).send("Categoria actualizada!");
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -103,10 +92,8 @@ export class CategoryController {
       const { categoryUuid } = req.params;
       await categoryService.deleteRootCategory(categoryUuid);
       return res.status(200).send("Categoria Eliminada!");
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -120,10 +107,8 @@ export class CategoryController {
       const { subCategoryId } = req.params;
       await categoryService.deleteSubCategory(subCategoryId);
       return res.status(200).send("Sub-Categoria eliminada!");
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 }

@@ -6,6 +6,7 @@ import {
 } from "../../../generated/prisma/client.js";
 import { productService } from "./product.service.js";
 import { formatResponse } from "../../../shared/utils/serializers.js";
+import { responseError } from "../../../shared/errors/ResponseError.js";
 
 export class ProductController {
   static createProduct = async (
@@ -15,16 +16,19 @@ export class ProductController {
     try {
       const { categoryId } = req.params;
       const files = (req.files as Express.Multer.File[]) || [];
+      if (files.length === 0)
+        return res
+          .status(400)
+          .json({ error: "Se requiere al menos una imagen!" });
+
       const imageUrls = files.map((file, index) => ({
         url: file.path,
         isPrimary: index === 0,
       }));
       await productService.createProduct(categoryId, req.body, imageUrls);
       return res.status(201).send("Producto creado!");
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -36,10 +40,8 @@ export class ProductController {
       const { uuid } = req.params;
       const product = await productService.getProduct(uuid);
       return res.status(200).json(formatResponse(product));
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -57,10 +59,8 @@ export class ProductController {
         limit,
       );
       return res.status(200).json(formatResponse(products));
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -72,10 +72,8 @@ export class ProductController {
       const { uuid } = req.params;
       await productService.updateProduct(uuid, req.body);
       return res.status(200).send("Producto actualizado!");
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -87,10 +85,8 @@ export class ProductController {
       const { uuid } = req.params;
       const isActiveMsj = await productService.isActiveProduct(uuid);
       return res.status(200).json(isActiveMsj);
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -100,13 +96,14 @@ export class ProductController {
   ) => {
     try {
       const { productId, imageId } = req.params;
-      const imageURL = req.file!.path;
+      if (!req.file)
+        return res.status(400).json({ error: "La imagen es requerida!" });
+
+      const imageURL = req.file.path;
       await productService.updateProductImage(productId, imageId, imageURL);
       return res.status(200).send("Imagen cambiada!");
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -116,13 +113,14 @@ export class ProductController {
   ) => {
     try {
       const { productId } = req.params;
-      const imageURL = req.file!.path;
+      if (!req.file)
+        return res.status(400).json({ error: "La imagen es requerida!" });
+
+      const imageURL = req.file.path;
       await productService.createProductImage(productId, imageURL);
       return res.status(201).send("Imagen añadida!");
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -134,10 +132,8 @@ export class ProductController {
       const { imageId } = req.params;
       await productService.deleteProductImage(imageId);
       return res.status(200).send("Imagen eliminada!");
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -149,10 +145,8 @@ export class ProductController {
       const { sku } = req.params;
       const product = await productService.getProductOrder(sku);
       return res.status(200).json(formatResponse(product));
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -165,10 +159,8 @@ export class ProductController {
 
       const product = await productService.searchProduct(p);
       return res.status(200).json(product);
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 }

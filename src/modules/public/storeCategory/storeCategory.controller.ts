@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { Category } from "../../../generated/prisma/client.js";
 import { storeCategoryService } from "./storeCategory.service.js";
 import { formatResponse } from "../../../shared/utils/serializers.js";
+import { responseError } from "../../../shared/errors/ResponseError.js";
 
 export class StoreCategoryController {
   static productsByCategory = async (
@@ -15,10 +16,8 @@ export class StoreCategoryController {
       const { categoryId } = req.params;
       const categoryProducts = await storeCategoryService.productsByCategory(categoryId, page, limit);
       return res.status(200).json(formatResponse(categoryProducts));
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 }

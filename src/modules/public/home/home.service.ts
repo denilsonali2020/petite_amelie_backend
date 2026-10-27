@@ -64,7 +64,7 @@ export const homeService = {
 
       return newArrivals.map((item) => ({
         ...item,
-        images: item.images[0].url,
+        images: item.images[0].url ?? null,
       }));
     } catch (error) {
       if (error instanceof Prisma.PrismaClientValidationError) {
@@ -150,7 +150,7 @@ export const homeService = {
         const mappedProducts = category.products
           .map((product) => ({
             ...product,
-            images: product.images[0].url,
+            images: product.images[0].url ?? null,
             orderItems: product.orderItems.reduce((accItem, item) => {
               return (accItem += item.quantity);
             }, 0),
@@ -230,7 +230,7 @@ export const homeService = {
         const mappedProducrts = category.products
           .map((product) => ({
             ...product,
-            images: product.images[0].url,
+            images: product.images[0].url ?? null,
           }))
           .sort((a, b) => b.stock - a.stock)
           .map(({ stock, ...product }) => product);

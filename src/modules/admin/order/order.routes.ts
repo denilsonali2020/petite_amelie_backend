@@ -5,6 +5,7 @@ import { OrderController } from "./order.controller.js";
 import { authenticate } from "../../../middleware/admin-auth.js";
 import { ORDER_STATUS, PAYMENT_METHOD } from "./order.types.js";
 import { authorizeRoles, ROLES } from "../../../middleware/roles.js";
+import { strictLimiter } from "../../../config/express-rate-limit.js";
 
 const router = Router();
 
@@ -12,6 +13,7 @@ const router = Router();
 // Crear una orden desde POS
 router.post(
   "/",
+  strictLimiter,
   authenticate,
   authorizeRoles(ROLES.OWNER, ROLES.ADMIN, ROLES.CASHIER),
   body("userUUID").isUUID().withMessage("Usuario no valido"),

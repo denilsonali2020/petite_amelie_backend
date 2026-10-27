@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 // Access Token: duración temporal de desarrollo.
 // En producción debe configurarse con una duración corta.
 export const generateAccessToken = (payload: { uuid: string }) => {
-  return jwt.sign(payload, process.env.JWT_ACCESS_SECRET!, { expiresIn: "7d" });
+  return jwt.sign(payload, process.env.JWT_ACCESS_SECRET!, { expiresIn: "15m" });
 };
 
 // Refresh Token: duración larga.

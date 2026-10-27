@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { adminAuthService } from "./admin-auth.service.js";
 import { User } from "../../../generated/prisma/client.js";
+import { responseError } from "../../../shared/errors/ResponseError.js";
 
 // Configuración de la cookie para el refresh token
 const COOKIE_OPTIONS = {
@@ -19,8 +20,8 @@ export class AdminAuthController {
       res.cookie("jwt", refreshToken, COOKIE_OPTIONS);
 
       return res.status(200).json({ accessToken, user: userData });
-    } catch (error: any) {
-      return res.status(error.status || 500).json({ error: error.message });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -32,10 +33,8 @@ export class AdminAuthController {
 
       const accessToken = await adminAuthService.refreshToken(cookies.jwt);
       return res.status(200).json({ accessToken });
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -53,10 +52,8 @@ export class AdminAuthController {
       });
 
       return res.status(200).json({ message: "Sesión cerrada" });
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -65,10 +62,8 @@ export class AdminAuthController {
     try {
       // req.user viene del middleware authenticate
       return res.status(200).json(req.user);
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 
@@ -80,10 +75,8 @@ export class AdminAuthController {
       const { uuid } = req.params;
       await adminAuthService.mustChangePassword(uuid, req.body);
       return res.status(200).send("Contraseña actualizada!");
-    } catch (error: any) {
-      return res.status(error.status || 500).json({
-        error: error.message,
-      });
+    } catch (error) {
+      return responseError(res, error);
     }
   };
 }

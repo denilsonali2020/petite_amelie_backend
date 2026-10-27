@@ -6,7 +6,7 @@ export const storeProductService = {
   async findProduct(uuid: Product["uuid"]) {
     try {
       const product = await prisma.product.findUnique({
-        where: { uuid },
+        where: { uuid, isActive: true },
         select: {
           name: true,
           description: true,
