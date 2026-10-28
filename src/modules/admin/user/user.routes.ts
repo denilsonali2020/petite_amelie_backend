@@ -5,6 +5,7 @@ import { userController } from "./user.controller.js";
 import { USER_ROLES } from "./user.types.js";
 import { authenticate } from "../../../middleware/admin-auth.js";
 import { authorizeRoles, ROLES } from "../../../middleware/roles.js";
+import { strictLimiter } from "../../../config/express-rate-limit.js";
 
 const router = Router();
 
@@ -74,6 +75,7 @@ router.put(
 //validar contraseña
 router.post(
   "/check-password",
+  strictLimiter,
   authenticate,
   authorizeRoles(ROLES.OWNER, ROLES.ADMIN, ROLES.CASHIER),
   body("password").notEmpty().withMessage("La contraseña es requerida"),

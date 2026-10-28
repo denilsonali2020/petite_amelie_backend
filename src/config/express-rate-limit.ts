@@ -3,7 +3,7 @@ import rateLimit from "express-rate-limit";
 // Configuración del límite para endpoints sensibles (ej. Auth, Pagos)
 export const strictLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 5,
+  max: 10,
   message: {
     error:
       "Límite de intentos. Espera unos minutos antes de volver a intentarlo.",
@@ -15,7 +15,7 @@ export const strictLimiter = rateLimit({
 // Configuración general para endpoints públicos
 export const publicLimiter = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minuto
-  max: 100,
+  max: 200,
   message: {
     error:
       "Límite de peticiones excedido. Por favor, espera 60 segundos antes de volver a intentarlo.",

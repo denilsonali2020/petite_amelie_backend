@@ -3,18 +3,20 @@ import { body, param } from "express-validator";
 import { handleInputErrors } from "../../../middleware/validation.js";
 import { AdminAuthController } from "./admin-auth.controller.js";
 import { authenticate } from "../../../middleware/admin-auth.js"; // Ajusta la ruta a tu middleware
+import { strictLimiter } from "../../../config/express-rate-limit.js";
 
 const router = Router();
 
 router.post(
   "/login",
+  strictLimiter,
   body("email").isEmail().withMessage("El email no es válido"),
   body("password").notEmpty().withMessage("La contraseña es obligatoria"),
   handleInputErrors,
   AdminAuthController.login,
 );
 
-router.get("/refresh", AdminAuthController.refreshToken);
+router.get("/refresh", strictLimiter, AdminAuthController.refreshToken);
 
 router.post("/logout", AdminAuthController.logout);
 

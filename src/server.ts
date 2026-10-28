@@ -26,6 +26,8 @@ import { publicLimiter } from "./config/express-rate-limit.js";
 //Instancia de express
 const app = express();
 
+app.set("trust proxy", 1);
+
 //Configuracion de CORS
 app.use(cors(corsConfig));
 
@@ -48,6 +50,15 @@ app.use(publicLimiter);
 
 //Poder enviar cookies
 app.use(cookieParser());
+
+app.get("/debug-ip", (req, res) => {
+  res.json({
+    ip: req.ip,
+    ips: req.ips,
+    remoteAddress: req.socket.remoteAddress,
+    forwardedFor: req.headers["x-forwarded-for"],
+  });
+});
 
 //Routes Administrative
 app.use("/api/category", categoryRoutes);
