@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./config/swagger.js";
@@ -22,11 +23,15 @@ import storeCategoryRoutes from "./modules/public/storeCategory/storeCategory.ro
 import { corsConfig } from "./config/cors.js";
 import { multerErrorHandler } from "./middleware/validation.js";
 import { publicLimiter } from "./config/express-rate-limit.js";
+import { globalErrorHandler } from "./middleware/error-handler.js";
 
 //Instancia de express
 const app = express();
 
 app.set("trust proxy", 1);
+
+//Cabeceras de seguridad HTTP
+app.use(helmet());
 
 //Configuracion de CORS
 app.use(cors(corsConfig));
@@ -71,5 +76,8 @@ app.use("/api/store/category", storeCategoryRoutes);
 
 // Errores de multer
 app.use(multerErrorHandler);
+
+//Middleware global de errores
+app.use(globalErrorHandler);
 
 export default app;

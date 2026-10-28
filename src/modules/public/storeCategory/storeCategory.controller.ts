@@ -2,22 +2,21 @@ import type { Request, Response } from "express";
 import { Category } from "../../../generated/prisma/client.js";
 import { storeCategoryService } from "./storeCategory.service.js";
 import { formatResponse } from "../../../shared/utils/serializers.js";
-import { responseError } from "../../../shared/errors/ResponseError.js";
 
 export class StoreCategoryController {
   static productsByCategory = async (
     req: Request<{ categoryId: Category["uuid"] }>,
     res: Response,
   ) => {
-    try {
-      const page = Number(req.query.page);
-      const limit = Number(req.query.limit);
+    const page = Number(req.query.page);
+    const limit = Number(req.query.limit);
 
-      const { categoryId } = req.params;
-      const categoryProducts = await storeCategoryService.productsByCategory(categoryId, page, limit);
-      return res.status(200).json(formatResponse(categoryProducts));
-    } catch (error) {
-      return responseError(res, error);
-    }
+    const { categoryId } = req.params;
+    const categoryProducts = await storeCategoryService.productsByCategory(
+      categoryId,
+      page,
+      limit,
+    );
+    return res.status(200).json(formatResponse(categoryProducts));
   };
 }

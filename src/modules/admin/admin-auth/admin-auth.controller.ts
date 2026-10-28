@@ -1,7 +1,6 @@
 import type { Request, Response } from "express";
 import { adminAuthService } from "./admin-auth.service.js";
 import { User } from "../../../generated/prisma/client.js";
-import { responseError } from "../../../shared/errors/ResponseError.js";
 
 // Configuración de la cookie para el refresh token
 const COOKIE_OPTIONS = {
@@ -13,70 +12,49 @@ const COOKIE_OPTIONS = {
 
 export class AdminAuthController {
   static login = async (req: Request, res: Response) => {
-    try {
-      const { accessToken, refreshToken, userData } =
-        await adminAuthService.login(req.body);
+    const { accessToken, refreshToken, userData } =
+      await adminAuthService.login(req.body);
 
-      res.cookie("jwt", refreshToken, COOKIE_OPTIONS);
+    res.cookie("jwt", refreshToken, COOKIE_OPTIONS);
 
-      return res.status(200).json({ accessToken, user: userData });
-    } catch (error) {
-      return responseError(res, error);
-    }
+    return res.status(200).json({ accessToken, user: userData });
   };
 
   static refreshToken = async (req: Request, res: Response) => {
-    try {
-      const cookies = req.cookies;
-      if (!cookies?.jwt)
-        return res.status(401).json({ error: "No autorizado" });
+    const cookies = req.cookies;
+    if (!cookies?.jwt) return res.status(401).json({ error: "No autorizado" });
 
-      const accessToken = await adminAuthService.refreshToken(cookies.jwt);
-      return res.status(200).json({ accessToken });
-    } catch (error) {
-      return responseError(res, error);
-    }
+    const accessToken = await adminAuthService.refreshToken(cookies.jwt);
+    return res.status(200).json({ accessToken });
   };
 
   static logout = async (req: Request, res: Response) => {
-    try {
-      const cookies = req.cookies;
-      if (!cookies?.jwt) return res.sendStatus(204);
+    const cookies = req.cookies;
+    if (!cookies?.jwt) return res.sendStatus(204);
 
-      await adminAuthService.logout(cookies.jwt);
+    await adminAuthService.logout(cookies.jwt);
 
-      res.clearCookie("jwt", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-      });
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
 
-      return res.status(200).json({ message: "Sesión cerrada" });
-    } catch (error) {
-      return responseError(res, error);
-    }
+    return res.status(200).json({ message: "Sesión cerrada" });
   };
 
   // Este método asume que la ruta usa tu middleware 'authenticate' previo
   static me = async (req: Request, res: Response) => {
-    try {
-      // req.user viene del middleware authenticate
-      return res.status(200).json(req.user);
-    } catch (error) {
-      return responseError(res, error);
-    }
+    // req.user viene del middleware authenticate
+    return res.status(200).json(req.user);
   };
 
   static mustChangePassword = async (
     req: Request<{ uuid: User["uuid"] }>,
     res: Response,
   ) => {
-    try {
-      const { uuid } = req.params;
-      await adminAuthService.mustChangePassword(uuid, req.body);
-      return res.status(200).send("Contraseña actualizada!");
-    } catch (error) {
-      return responseError(res, error);
-    }
+    const { uuid } = req.params;
+    await adminAuthService.mustChangePassword(uuid, req.body);
+    return res.status(200).send("Contraseña actualizada!");
   };
 }
