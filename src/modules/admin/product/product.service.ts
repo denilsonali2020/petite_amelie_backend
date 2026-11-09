@@ -303,7 +303,10 @@ export const productService = {
             },
           },
           {
-            sku: p,
+            sku: {
+              contains: p, // en sql seria el LIKE
+              mode: "insensitive", // ignora mayusculas de minusculas
+            },
           },
         ],
       },
