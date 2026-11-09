@@ -43,7 +43,7 @@ export const productService = {
   },
 
   async getProduct(uuid: product["uuid"]) {
-    const product = await prisma.product.findUnique({
+    const findProduct = await prisma.product.findUnique({
       where: { uuid },
       select: {
         name: true,
@@ -66,11 +66,27 @@ export const productService = {
           },
           orderBy: { id: "asc" },
         },
+        category: {
+          select: {
+            uuid: true,
+            parent: {
+              select: {
+                uuid: true,
+              },
+            },
+          },
+        },
       },
     });
-    if (!product) throw new HttpError("El producto no existe", 404);
+    if (!findProduct) throw new HttpError("El producto no existe", 404);
 
-    return product;
+    const { category, ...product } = findProduct;
+
+    return {
+      ...product,
+      rootCategoryId: category.parent!.uuid,
+      subCategoryId: category.uuid,
+    };
   },
 
   async getProductsByCategory(
