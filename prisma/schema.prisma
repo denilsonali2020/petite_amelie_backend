@@ -279,6 +279,9 @@ model OrderItem {
 
   orderId Int
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id])
 }
