@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { adminAuthService } from "./admin-auth.service.js";
 import { User } from "../../../generated/prisma/client.js";
+import { HttpError } from "../../../shared/errors/HttpError.js";
 
 // Configuración de la cookie para el refresh token
 const COOKIE_OPTIONS = {
@@ -54,6 +55,8 @@ export class AdminAuthController {
     res: Response,
   ) => {
     const { uuid } = req.params;
+    if (uuid !== req.user?.uuid)
+      throw new HttpError("Accion no permitida!", 409);
     await adminAuthService.mustChangePassword(uuid, req.body);
     return res.status(200).send("Contraseña actualizada!");
   };

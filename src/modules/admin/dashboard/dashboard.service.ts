@@ -76,7 +76,15 @@ export const dashboardService = {
   },
 
   //estudiar logica
-  async getTopSellingSubcategories() {
+  async getTopSellingSubcategories(m: number) {
+    const year = new Date().getFullYear();
+
+    // Rango del mes: [inicio, fin)
+    // Honduras es UTC-6, por eso sumamos 6 horas para que el mes
+    // empiece a las 00:00 hora local y no a las 00:00 UTC
+    const startDate = new Date(Date.UTC(year, m - 1, 1, 6));
+    const endDate = new Date(Date.UTC(year, m, 1, 6));
+
     const categories = await prisma.category.findMany({
       // Buscamos categorías que tengan al menos un producto
       where: {
@@ -92,6 +100,10 @@ export const dashboardService = {
               where: {
                 order: {
                   status: { in: ["PAID", "DELIVERED", "SHIPPED"] },
+                  createdAt: {
+                    gte: startDate,
+                    lte: endDate,
+                  },
                 },
               },
               select: {
@@ -128,7 +140,15 @@ export const dashboardService = {
       .slice(0, 6); // 3. Tomar solo los primeros 6
   },
 
-  async getTopSellingProducts() {
+  async getTopSellingProducts(m: number) {
+    const year = new Date().getFullYear();
+
+    // Rango del mes: [inicio, fin)
+    // Honduras es UTC-6, por eso sumamos 6 horas para que el mes
+    // empiece a las 00:00 hora local y no a las 00:00 UTC
+    const startDate = new Date(Date.UTC(year, m - 1, 1, 6));
+    const endDate = new Date(Date.UTC(year, m, 1, 6));
+
     const products = await prisma.product.findMany({
       where: { orderItems: { some: {} } },
       select: {
@@ -137,6 +157,7 @@ export const dashboardService = {
         stock: true,
         orderItems: {
           select: { quantity: true, price: true },
+          where: { createdAt: { gte: startDate, lte: endDate } },
         },
       },
     });

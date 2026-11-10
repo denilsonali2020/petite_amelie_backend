@@ -50,8 +50,6 @@ export const orderService = {
           where: { uuid: item.uuid },
         });
         if (!product) throw new HttpError("El producto no existe", 404);
-        if (product.stock < item.quantity)
-          throw new HttpError(`Stock insuficiente para ${product.name}`, 409);
 
         // identificar precios y descuentos
         const originalPrice = product.price;
@@ -66,6 +64,18 @@ export const orderService = {
         totalToPay += +priceToSave * item.quantity;
         totalCalculatedDiscount += discountToSave * item.quantity;
 
+        //descontar el stock de cada producto
+        const result = await tx.product.updateMany({
+          where: { id: product.id, stock: { gte: item.quantity } },
+          data: {
+            stock: { decrement: item.quantity },
+          },
+        });
+
+        if (result.count === 0) {
+          throw new HttpError(`Stock insuficiente para ${product.name}`, 409);
+        }
+
         //almacenamos la informacion del item en un arreglo para orderItems
         processedItems.push({
           name: product.name,
@@ -76,14 +86,6 @@ export const orderService = {
           price: priceToSave,
           realCost: product.cost,
           realPrice: product.price,
-        });
-
-        //descontar el stock de cada producto
-        await tx.product.update({
-          where: { id: product.id },
-          data: {
-            stock: { decrement: item.quantity },
-          },
         });
       } //Fin de For
 

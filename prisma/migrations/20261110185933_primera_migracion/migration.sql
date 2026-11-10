@@ -25,6 +25,7 @@ CREATE TABLE "User" (
     "password" TEXT NOT NULL,
     "role" "UserRole" NOT NULL DEFAULT 'CASHIER',
     "refreshToken" TEXT,
+    "quickPin" TEXT,
     "mustChangePassword" BOOLEAN NOT NULL DEFAULT true,
     "isActive" BOOLEAN NOT NULL DEFAULT true,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -56,6 +57,7 @@ CREATE TABLE "Category" (
     "id" SERIAL NOT NULL,
     "uuid" TEXT NOT NULL,
     "name" TEXT NOT NULL,
+    "description" TEXT,
     "position" INTEGER NOT NULL,
     "imageURL" TEXT,
     "parentId" INTEGER,
@@ -189,6 +191,8 @@ CREATE TABLE "OrderItem" (
     "price" DECIMAL(10,2) NOT NULL,
     "isRedemption" BOOLEAN NOT NULL DEFAULT false,
     "orderId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "OrderItem_pkey" PRIMARY KEY ("id")
 );

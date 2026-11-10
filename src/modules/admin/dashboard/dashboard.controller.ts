@@ -12,13 +12,21 @@ export class DashboardController {
     return res.status(200).json(recentOrders);
   };
 
-  static getTopSellingSubcategories = async (req: Request, res: Response) => {
-    const topCategories = await dashboardService.getTopSellingSubcategories();
+  static getTopSellingSubcategories = async (
+    req: Request<{}, {}, {}, { m: string }>,
+    res: Response,
+  ) => {
+    const m = +req.query.m;
+    const topCategories = await dashboardService.getTopSellingSubcategories(m);
     return res.status(200).json(topCategories);
   };
 
-  static getTopSellingProducts = async (req: Request, res: Response) => {
-    const topProducts = await dashboardService.getTopSellingProducts();
+  static getTopSellingProducts = async (
+    req: Request<{}, {}, {}, { m: string }>,
+    res: Response,
+  ) => {
+    const m = +req.query.m;
+    const topProducts = await dashboardService.getTopSellingProducts(m);
     return res.status(200).json(topProducts);
   };
 }
