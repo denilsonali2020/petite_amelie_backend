@@ -9,6 +9,7 @@ import jwt from "jsonwebtoken";
 import { AdminLoginForm, mustChangePassword } from "./admin-auth.types.js";
 import { Prisma } from "../../../generated/prisma/client.js";
 import { user } from "../user/user.types.js";
+import { createHash256 } from "../../../shared/utils/sha256.js";
 
 export const adminAuthService = {
   async login({ email, password }: AdminLoginForm) {
@@ -32,7 +33,7 @@ export const adminAuthService = {
     // 5. Guardar Refresh Token en la BD
     await prisma.user.update({
       where: { id: user.id },
-      data: { refreshToken },
+      data: { refreshToken: createHash256(refreshToken) },
     });
 
     return {
@@ -50,8 +51,9 @@ export const adminAuthService = {
 
   async refreshToken(currentToken: string) {
     // 1. Buscar usuario con ese token
+    const hashToken = createHash256(currentToken);
     const user = await prisma.user.findFirst({
-      where: { refreshToken: currentToken },
+      where: { refreshToken: hashToken },
     });
     if (!user || !user.isActive) throw new HttpError("Acceso denegado", 403);
 
@@ -60,7 +62,8 @@ export const adminAuthService = {
       const decoded = jwt.verify(
         currentToken,
         process.env.JWT_REFRESH_SECRET!,
-      ) as { uuid: string };
+        { algorithms: ["HS256"] },
+      ) as jwt.JwtPayload;
 
       if (user.uuid !== decoded.uuid)
         throw new HttpError("Acceso denegado", 403);
