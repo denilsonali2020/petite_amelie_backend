@@ -3,7 +3,7 @@ import { body, param } from "express-validator";
 import { handleInputErrors } from "../../../middleware/validation.js";
 import { AdminAuthController } from "./admin-auth.controller.js";
 import { authenticate } from "../../../middleware/admin-auth.js"; // Ajusta la ruta a tu middleware
-import { strictLimiter } from "../../../config/express-rate-limit.js";
+import { strictLimiter } from "../../../middleware/express-rate-limit.js";
 
 const router = Router();
 

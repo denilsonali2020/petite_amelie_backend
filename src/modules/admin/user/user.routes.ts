@@ -5,7 +5,7 @@ import { userController } from "./user.controller.js";
 import { USER_ROLES } from "./user.types.js";
 import { authenticate } from "../../../middleware/admin-auth.js";
 import { authorizeRoles, ROLES } from "../../../middleware/roles.js";
-import { strictLimiter } from "../../../config/express-rate-limit.js";
+import { strictLimiter } from "../../../middleware/express-rate-limit.js";
 
 const router = Router();
 

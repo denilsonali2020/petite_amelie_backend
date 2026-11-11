@@ -5,7 +5,7 @@ import { OrderController } from "./order.controller.js";
 import { authenticate } from "../../../middleware/admin-auth.js";
 import { ORDER_STATUS, PAYMENT_METHOD } from "./order.types.js";
 import { authorizeRoles, ROLES } from "../../../middleware/roles.js";
-import { strictLimiter } from "../../../config/express-rate-limit.js";
+import { strictLimiter } from "../../../middleware/express-rate-limit.js";
 
 const router = Router();
 

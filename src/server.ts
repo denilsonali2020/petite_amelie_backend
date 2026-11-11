@@ -22,13 +22,20 @@ import storeCategoryRoutes from "./modules/public/storeCategory/storeCategory.ro
 // import authRoutes from "../src/modules/auth/auth.routes.js"; //rutas de cliente pendiente
 import { corsConfig } from "./config/cors.js";
 import { multerErrorHandler } from "./middleware/validation.js";
-import { publicLimiter } from "./config/express-rate-limit.js";
+import { publicLimiter } from "./middleware/express-rate-limit.js";
 import { globalErrorHandler } from "./middleware/error-handler.js";
 
 //Instancia de express
 const app = express();
 
 app.set("trust proxy", 1);
+app.get("/debug/ip", (req, res) => {
+  res.json({
+    ip: req.ip,
+    ips: req.ips,
+    forwardedFor: req.headers["x-forwarded-for"],
+  });
+});
 
 //Cabeceras de seguridad HTTP
 app.use(helmet());
