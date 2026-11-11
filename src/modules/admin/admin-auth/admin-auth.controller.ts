@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { adminAuthService } from "./admin-auth.service.js";
 import { User } from "../../../generated/prisma/client.js";
 import { HttpError } from "../../../shared/errors/HttpError.js";
-import { COOKIE_OPTIONS } from "../../../shared/utils/COOKIES.js";
+import { COOKIE_OPTIONS } from "../../../shared/utils/cookies.js";
 
 export class AdminAuthController {
   static login = async (req: Request, res: Response) => {
