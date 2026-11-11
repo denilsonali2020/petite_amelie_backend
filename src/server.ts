@@ -28,7 +28,7 @@ import { globalErrorHandler } from "./middleware/error-handler.js";
 //Instancia de express
 const app = express();
 
-app.set("trust proxy", 1);
+app.set("trust proxy", 2);
 app.get("/debug/ip", (req, res) => {
   res.json({
     ip: req.ip,
