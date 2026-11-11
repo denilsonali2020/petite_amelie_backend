@@ -29,13 +29,6 @@ import { globalErrorHandler } from "./middleware/error-handler.js";
 const app = express();
 
 app.set("trust proxy", 3);
-app.get("/debug/ip", (req, res) => {
-  res.json({
-    ip: req.ip,
-    ips: req.ips,
-    forwardedFor: req.headers["x-forwarded-for"],
-  });
-});
 
 //Cabeceras de seguridad HTTP
 app.use(helmet());
