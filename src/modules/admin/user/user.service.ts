@@ -101,7 +101,7 @@ export const userService = {
         data.password,
         user.password,
       );
-      if (!isPasswordCorrect) throw new HttpError("Contraseña incorrecta", 401);
+      if (!isPasswordCorrect) throw new HttpError("Contraseña incorrecta", 409);
     } catch (error: any) {
       if (error instanceof Prisma.PrismaClientValidationError) {
         throw new HttpError(
