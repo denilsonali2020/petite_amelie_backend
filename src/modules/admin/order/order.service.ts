@@ -64,7 +64,7 @@ export const orderService = {
         totalToPay += +priceToSave * item.quantity;
         totalCalculatedDiscount += discountToSave * item.quantity;
 
-        //descontar el stock de cada producto
+        //descontar el stock de cada producto con una actualizacion atomica
         const result = await tx.product.updateMany({
           where: { id: product.id, stock: { gte: item.quantity } },
           data: {
