@@ -2,21 +2,21 @@ import { Router } from "express";
 import { body, param } from "express-validator";
 import { handleInputErrors } from "../../../middleware/validation.js";
 import { AdminAuthController } from "./admin-auth.controller.js";
-import { authenticate } from "../../../middleware/admin-auth.js"; // Ajusta la ruta a tu middleware
-import { strictLimiter } from "../../../middleware/express-rate-limit.js";
+import { authenticate } from "../../../middleware/admin-auth.js";
+import { responsiveLimiter } from "../../../middleware/express-rate-limit.js";
 
 const router = Router();
 
 router.post(
   "/login",
-  strictLimiter,
+  responsiveLimiter(10, 5),
   body("email").isEmail().withMessage("El email no es válido"),
   body("password").notEmpty().withMessage("La contraseña es obligatoria"),
   handleInputErrors,
   AdminAuthController.login,
 );
 
-router.get("/refresh", strictLimiter, AdminAuthController.refreshToken);
+router.get("/refresh", AdminAuthController.refreshToken);
 
 router.post("/logout", AdminAuthController.logout);
 

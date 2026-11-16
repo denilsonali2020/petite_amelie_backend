@@ -252,4 +252,35 @@ export const homeService = {
       throw error;
     }
   },
+
+  async searchProduct(p: string) {
+    const products = await prisma.product.findMany({
+      where: {
+        name: {
+          contains: p,
+          mode: "insensitive",
+        },
+        isActive: true,
+      },
+      select: {
+        uuid: true,
+        name: true,
+        cost: true,
+        price: true,
+        isOnDiscount: true,
+        discountPrice: true,
+        stock: true,
+        category: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    return products.map((p) => ({
+      ...p,
+      category: p.category.name,
+    }));
+  },
 };

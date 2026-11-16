@@ -32,4 +32,14 @@ export class HomeController {
       await homeService.getOffersPerTopCategories();
     return res.status(200).json(formatResponse(categoryProductsOffers));
   };
+
+  static searchProduct = async (
+    req: Request<{}, {}, {}, { p: string }>,
+    res: Response,
+  ) => {
+    const { p } = req.query;
+    const products = await homeService.searchProduct(p);
+
+    return res.status(200).json(formatResponse(products));
+  };
 }

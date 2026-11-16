@@ -1,4 +1,6 @@
 import rateLimit from "express-rate-limit";
+import type { Request, Response, NextFunction } from "express";
+import { HttpError } from "../shared/errors/HttpError.js";
 
 // Configuración del límite para endpoints sensibles (ej. Auth, Pagos)
 export const strictLimiter = rateLimit({
@@ -23,3 +25,28 @@ export const publicLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+export const responsiveLimiter = (limit: number, minutes: number) => {
+  return rateLimit({
+    windowMs: minutes * 60 * 1000,
+    max: limit,
+    standardHeaders: true,
+    legacyHeaders: false,
+    handler: (req: Request, res: Response, next: NextFunction) => {
+      const resetTime = (
+        req as Request & { rateLimit: number & { resetTime: Date } }
+      ).rateLimit?.resetTime;
+
+      const minutesRemaining = resetTime
+        ? Math.ceil((resetTime.getTime() - Date.now()) / (1000 * 60))
+        : minutes;
+
+      next(
+        new HttpError(
+          `Límite de intentos. Espera ${minutesRemaining} minutos antes de volver a intentarlo.`,
+          429,
+        ),
+      );
+    },
+  });
+};

@@ -1,5 +1,7 @@
 import { Router } from "express";
 import { HomeController } from "./home.controller.js";
+import { query } from "express-validator";
+import { handleInputErrors } from "../../../middleware/validation.js";
 
 const router = Router();
 
@@ -17,6 +19,18 @@ router.get("/sub-categories/latest", HomeController.getLatestSubcategories);
 router.get(
   "/best-sellers/latest",
   HomeController.getBestSellersPerTopCategories,
+);
+
+// search for a product by name
+router.get(
+  "/search",
+  query("p")
+    .isString()
+    .trim()
+    .isLength({ min: 2 })
+    .withMessage("Ingrese una cadena de texto con al menos 2 caracteres"),
+  handleInputErrors,
+  HomeController.searchProduct,
 );
 
 // offers return all categories with all products in offer
