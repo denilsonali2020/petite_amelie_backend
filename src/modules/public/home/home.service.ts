@@ -265,11 +265,7 @@ export const homeService = {
       select: {
         uuid: true,
         name: true,
-        cost: true,
-        price: true,
-        isOnDiscount: true,
-        discountPrice: true,
-        stock: true,
+        images: { where: { isPrimary: true }, select: { url: true } },
         category: {
           select: {
             name: true,
@@ -280,6 +276,7 @@ export const homeService = {
 
     return products.map((p) => ({
       ...p,
+      images: p.images[0].url,
       category: p.category.name,
     }));
   },
