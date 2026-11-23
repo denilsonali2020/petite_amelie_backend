@@ -15,7 +15,7 @@ export const adminAuthService = {
   async login({ email, password }: AdminLoginForm) {
     // 1. Buscar usuario
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) throw new HttpError("Usuario no encontrado", 404);
+    if (!user) throw new HttpError("Credenciales incorrectas", 404);
 
     // 2. Verificar si está activo (importante para empleados dados de baja)
     if (!user.isActive) {
